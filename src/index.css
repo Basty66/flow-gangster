@@ -1,18 +1,126 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700;800&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  * { @apply m-0 p-0 box-border; }
-  body {
-    @apply font-body antialiased bg-deep text-[#fafafa];
+  html {
     scroll-behavior: smooth;
   }
-  ::-webkit-scrollbar { width: 3px; }
-  ::-webkit-scrollbar-track { background: #0a0a0f; }
-  ::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 2px; }
+  body {
+    @apply bg-deep text-[#a3a3a3] font-body antialiased;
+  }
+  ::selection {
+    @apply bg-purple/30 text-white;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-deep;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-[#1e1e2e] rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-purple/30;
+  }
+}
+
+@layer utilities {
+  .btn-primary {
+    @apply relative overflow-hidden px-8 py-3.5 font-display font-bold text-xs tracking-[0.15em] uppercase rounded-full transition-all duration-500;
+    background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+    color: #0a0a0f;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background: linear-gradient(135deg, #22d3ee, #8b5cf6);
+    transition: opacity 0.5s ease;
+    border-radius: inherit;
+  }
+  .btn-primary:hover::before {
+    opacity: 1;
+  }
+  .btn-primary span,
+  .btn-primary svg {
+    position: relative;
+    z-index: 1;
+  }
+  .btn-secondary {
+    @apply px-8 py-3.5 font-display font-bold text-xs tracking-[0.15em] uppercase rounded-full border border-[#1e1e2e] text-[#a3a3a3] transition-all duration-500;
+  }
+  .btn-secondary:hover {
+    @apply border-purple/30 text-white;
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.1);
+  }
+  .glass-card {
+    @apply rounded-2xl backdrop-blur-xl;
+    background: rgba(18, 18, 26, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  .glass-card-hover {
+    @apply glass-card transition-all duration-500;
+  }
+  .glass-card-hover:hover {
+    border-color: rgba(139, 92, 246, 0.15);
+    box-shadow: 0 8px 40px rgba(139, 92, 246, 0.08);
+    transform: translateY(-2px);
+  }
+  .badge-stock {
+    @apply text-[10px] font-mono font-medium tracking-[0.15em] uppercase px-3 py-1 rounded-full;
+    background: rgba(34, 211, 238, 0.08);
+    color: #22d3ee;
+    border: 1px solid rgba(34, 211, 238, 0.15);
+  }
+  .badge-preorder {
+    @apply text-[10px] font-mono font-medium tracking-[0.15em] uppercase px-3 py-1 rounded-full;
+    background: rgba(139, 92, 246, 0.08);
+    color: #8b5cf6;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+  }
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl text-sm font-body outline-none transition-all duration-500;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: #e5e5e5;
+  }
+  .input-field:focus {
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.05);
+  }
+  .input-field::placeholder {
+    color: #525252;
+  }
+  .text-gradient-purple-cyan {
+    @apply bg-gradient-to-r from-purple to-cyan bg-clip-text text-transparent;
+  }
+  .text-gradient-cyan-orange {
+    @apply bg-gradient-to-r from-cyan to-orange bg-clip-text text-transparent;
+  }
+  .text-gradient-purple-orange {
+    @apply bg-gradient-to-r from-purple via-cyan to-orange bg-clip-text text-transparent;
+  }
+  .text-gradient-all {
+    @apply bg-gradient-to-r from-purple via-cyan to-orange bg-clip-text text-transparent;
+  }
+  .hero-text-glow {
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, filter;
+  }
+  .hero-text-glow:hover {
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 60px rgba(139, 92, 246, 0.25)) drop-shadow(0 0 120px rgba(34, 211, 238, 0.15));
+  }
+  .blur-circle {
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
 }
 
 @layer components {

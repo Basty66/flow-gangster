@@ -55,18 +55,18 @@ export default function Home({ onLogoClick }) {
       </div>
 
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-purple/10 rounded-full blur-[250px] animate-pulse" style={{ animationDuration: '6s' }} />
-          <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-cyan/10 rounded-full blur-[200px] animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-orange/5 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '10s' }} />
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="blur-circle absolute top-1/4 left-1/4 w-[700px] h-[700px] bg-purple/10 rounded-full blur-[280px] animate-morph" style={{ animationDelay: '0s' }} />
+          <div className="blur-circle absolute bottom-1/3 right-1/4 w-[500px] h-[500px] bg-cyan/10 rounded-full blur-[220px] animate-morph2" style={{ animationDelay: '-3s' }} />
+          <div className="blur-circle absolute top-1/2 left-1/2 w-[350px] h-[350px] bg-orange/5 rounded-full blur-[180px] animate-morph3" style={{ animationDelay: '-6s' }} />
         </div>
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <p className="text-[#525252] font-mono text-xs tracking-[0.3em] mb-6 uppercase animate-fade-in">
             Flow Gangster / Coleccion 2026
           </p>
-          <h1 className="font-display font-extrabold text-7xl md:text-[8rem] lg:text-[10rem] leading-[0.85] tracking-[-0.03em] mb-6
-                       animate-slide-up text-gradient-all"
+          <h1 className="hero-text-glow font-display font-extrabold text-7xl md:text-[8rem] lg:text-[10rem] leading-[0.85] tracking-[-0.03em] mb-6
+                       animate-slide-up text-gradient-all cursor-default"
               style={{ animationDelay: '0.1s', opacity: 0 }}>
             NEXT<br />DROP
           </h1>
