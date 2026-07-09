@@ -8,13 +8,13 @@ const SearchIcon = () => (
   </svg>
 );
 
-const ChevronDownIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+const ChevronDown = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="6 9 12 15 18 9"/>
   </svg>
 );
 
-export default function Home() {
+export default function Home({ onLogoClick }) {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState('TODO');
@@ -39,30 +39,44 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="font-display font-bold text-lg tracking-[0.1em] text-[#525252]">CARGANDO</p>
+          <div className="w-10 h-10 border border-purple border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="font-display font-bold text-lg tracking-[0.1em] text-[#525252] animate-pulse">CARGANDO</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      {/* Floating logo */}
+      <div className="hidden lg:block fixed pointer-events-none z-0 opacity-[0.03]">
+        <img src="/logo.svg" alt="" className="w-32 h-32 animate-float" style={{ position: 'fixed', top: '20%', left: '5%' }} />
+        <img src="/logo.svg" alt="" className="w-24 h-24 animate-float-reverse" style={{ position: 'fixed', top: '60%', right: '8%' }} />
+      </div>
+
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-white/5">
         <div className="absolute inset-0">
-          <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[200px]" />
-          <div className="absolute bottom-1/3 right-1/3 w-[400px] h-[400px] bg-white/5 rounded-full blur-[200px]" />
+          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-purple/10 rounded-full blur-[250px] animate-pulse" style={{ animationDuration: '6s' }} />
+          <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-cyan/10 rounded-full blur-[200px] animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-orange/5 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '10s' }} />
         </div>
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <p className="text-[#525252] font-medium text-xs tracking-[0.25em] mb-6 uppercase">Flow Gangster / Coleccion 2026</p>
-          <h1 className="font-display font-extrabold text-7xl md:text-[8rem] lg:text-[10rem] leading-[0.85] tracking-[-0.03em] text-[#fafafa] mb-6">
+          <p className="text-[#525252] font-mono text-xs tracking-[0.3em] mb-6 uppercase animate-fade-in">
+            Flow Gangster / Coleccion 2026
+          </p>
+          <h1 className="font-display font-extrabold text-7xl md:text-[8rem] lg:text-[10rem] leading-[0.85] tracking-[-0.03em] mb-6
+                       animate-slide-up text-gradient-all"
+              style={{ animationDelay: '0.1s', opacity: 0 }}>
             NEXT<br />DROP
           </h1>
-          <p className="text-[#525252] text-base md:text-lg max-w-xl mx-auto mb-10 font-body font-normal leading-relaxed">
-            Stock fisico directo y pedidos por encargo. Solo ediciones seleccionadas.
+          <p className="text-[#525252] text-base md:text-lg max-w-xl mx-auto mb-10 font-body font-normal leading-relaxed animate-fade-up"
+             style={{ animationDelay: '0.3s', opacity: 0 }}>
+            Zapatillas urbanas directo de la calle a tus pies. Stock fisico en Melipilla
+            y pedidos por encargo con delivery a todo Chile.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-4 animate-fade-up"
+               style={{ animationDelay: '0.5s', opacity: 0 }}>
             <Link to="#catalogo"
                   className="btn-primary text-sm"
                   onClick={(e) => { e.preventDefault(); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}>
@@ -73,27 +87,29 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="flex justify-center gap-8 md:gap-16 mt-16">
+          <div className="flex justify-center gap-8 md:gap-16 mt-16 animate-fade-up"
+               style={{ animationDelay: '0.7s', opacity: 0 }}>
             {[
               { n: productos.filter(p => p.modalidad === 'STOCK').length, l: 'INSTANT DROP' },
               { n: productos.filter(p => p.modalidad === 'ENCARGO').length, l: 'PRE-ORDER' },
               { n: marcas.length, l: 'MARCAS' },
             ].map((s) => (
               <div key={s.l} className="text-center">
-                <p className="font-display font-extrabold text-3xl md:text-4xl text-accent">{s.n}</p>
+                <p className="font-display font-extrabold text-3xl md:text-4xl text-gradient-purple-cyan">{s.n}</p>
                 <p className="text-[#525252] text-xs font-medium tracking-[0.15em] uppercase">{s.l}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDownIcon />
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-[#525252]">
+          <ChevronDown />
         </div>
       </section>
 
-      <section id="catalogo" className="max-w-7xl mx-auto px-4 py-20">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-10 pb-8 border-b border-white/5">
+      <section id="catalogo" className="max-w-7xl mx-auto px-4 py-20 relative z-10">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-10 pb-8 border-b border-white/5"
+             style={{ animation: 'fade-up 0.7s ease-out forwards', animationTimeline: 'view()', animationRange: 'entry 0% entry 20%' }}>
           <div className="flex flex-wrap gap-2">
             {[
               { key: 'TODO', label: 'TODO' },
@@ -104,7 +120,7 @@ export default function Home() {
                       className={`px-5 py-2.5 border font-bold text-[11px] tracking-[0.15em] uppercase
                                 transition-all duration-300 ${
                         filtro === f.key
-                          ? 'bg-[#fafafa] text-black border-[#fafafa]'
+                          ? 'bg-purple text-white border-purple'
                           : 'bg-transparent text-[#525252] border-white/10 hover:border-white/30'
                       }`}>
                 {f.label}
@@ -133,17 +149,18 @@ export default function Home() {
         )}
       </section>
 
-      <section className="border-t border-white/5 py-20">
+      <section className="border-t border-white/5 py-20 relative z-10">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <span className="badge-preorder text-xs mb-4 inline-block">PRE-ORDER</span>
-          <h2 className="font-display font-extrabold text-4xl md:text-5xl text-[#fafafa] mb-4 tracking-[-0.02em]">
+          <h2 className="font-display font-extrabold text-4xl md:text-5xl mb-4 tracking-[-0.02em]
+                       animate-tilt text-gradient-purple-orange">
             NO ENCUENTRAS TU TALLE?
           </h2>
           <p className="text-[#525252] text-base max-w-xl mx-auto mb-8 font-body leading-relaxed">
             Trabajamos con pedidos por encargo. Si quieres un modelo que no esta en stock,
             lo importamos directo para ti. Tiempo estimado: 15-20 dias habiles.
           </p>
-          <button onClick={() => setFiltro('ENCARGO')} className="btn-primary text-sm">
+          <button onClick={() => setFiltro('ENCARGO')} className="btn-primary text-sm animate-glow-pulse">
             VER MODELOS DISPONIBLES
           </button>
         </div>

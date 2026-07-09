@@ -1,9 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
-  <rect x="94" y="35" width="12" height="12" stroke="#06b6d4" stroke-width="1.5" fill="none" transform="rotate(45, 100, 41)"/>
-  <line x1="50" y1="70" x2="150" y2="70" stroke="#fafafa" stroke-width="0.5"/>
-  <text x="100" y="105" font-family="Inter, sans-serif" font-weight="800" font-size="14"
-        fill="#fafafa" text-anchor="middle" letter-spacing="8">FLOW</text>
-  <text x="100" y="130" font-family="Inter, sans-serif" font-weight="800" font-size="14"
-        fill="#fafafa" text-anchor="middle" letter-spacing="8">GANGSTER</text>
-  <circle cx="100" cy="152" r="2" fill="#06b6d4"/>
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Head dome + body -->
+  <path d="M55 100 C55 40 145 40 145 100 C145 130 130 150 100 155 C70 150 55 130 55 100 Z" fill="url(#g1)" stroke="#8b5cf6" stroke-width="2"/>
+
+  <!-- Angry eyes / geometric slits -->
+  <g transform="translate(100, 82)">
+    <path d="M-20 -6 L-10 6" stroke="#fafafa" stroke-width="3" stroke-linecap="round"/>
+    <path d="M20 -6 L10 6" stroke="#fafafa" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-26 -14 L-12 -6" stroke="#fafafa" stroke-width="3" stroke-linecap="round"/>
+    <path d="M26 -14 L12 -6" stroke="#fafafa" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Mouth - angry line -->
+  <path d="M90 96 Q100 91 110 96" stroke="#fafafa" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Tentacles -->
+  <g stroke="url(#g2)" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M62 105 C48 120 38 140 32 160 C28 173 25 180 22 185"/>
+    <path d="M76 110 C66 128 58 148 52 165 C48 176 45 182 42 186"/>
+    <path d="M90 112 C82 128 76 146 72 162 C68 175 65 182 62 186"/>
+    <path d="M110 112 C118 128 124 146 128 162 C132 175 135 182 138 186"/>
+    <path d="M124 110 C134 128 142 148 148 165 C152 176 155 182 158 186"/>
+    <path d="M138 105 C152 120 162 140 168 160 C172 173 175 180 178 185"/>
+  </g>
+
+  <!-- Cyan dot accent -->
+  <circle cx="100" cy="172" r="3" fill="#22d3ee"/>
+
+  <!-- FG subtle -->
+  <text x="100" y="188" font-family="Inter, sans-serif" font-weight="700" font-size="7"
+        fill="#fafafa" text-anchor="middle" letter-spacing="3" opacity="0.4">FG</text>
 </svg>

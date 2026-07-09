@@ -26,21 +26,16 @@ export default function Seguimiento() {
     try {
       const res = await fetch(`/api/seguimiento?pedido_id=${pedidoId}`);
       const data = await res.json();
-      if (res.ok) {
-        setResultado(data);
-      } else {
-        setError(data.error);
-      }
-    } catch {
-      setError('Error al consultar');
-    }
+      if (res.ok) { setResultado(data); }
+      else { setError(data.error); }
+    } catch { setError('Error al consultar'); }
     setLoading(false);
   };
 
   const estados = {
-    PENDIENTE_PAGO: { label: 'Pendiente de Pago', color: 'text-amber' },
-    PAGADO: { label: 'Pagado - En Preparacion', color: 'text-accent' },
-    ENVIADO: { label: 'Enviado', color: 'text-accent' },
+    PENDIENTE_PAGO: { label: 'Pendiente de Pago', color: 'text-orange' },
+    PAGADO: { label: 'Pagado - En Preparacion', color: 'text-purple' },
+    ENVIADO: { label: 'Enviado', color: 'text-cyan' },
     CANCELADO: { label: 'Cancelado', color: 'text-red-400' },
   };
 
@@ -54,8 +49,8 @@ export default function Seguimiento() {
 
         <div className="flex gap-3 mb-8">
           <input value={pedidoId} onChange={(e) => setPedidoId(e.target.value)}
-                 placeholder="Ej: 123e4567-e89b-12d3-a456-426614174000"
-                 className="input-field flex-1 text-xs" />
+                 placeholder="ID del pedido (ej: abc123...)"
+                 className="input-field flex-1 text-xs font-mono" />
           <button onClick={buscar} disabled={loading}
                   className="btn-primary text-[10px] px-5 py-3">
             {loading ? '...' : 'BUSCAR'}
@@ -64,7 +59,7 @@ export default function Seguimiento() {
 
         {error && (
           <div className="glass-card p-6 text-center animate-fade-in">
-            <p className="text-red-400 font-bold text-sm">{error}</p>
+            <p className="text-orange font-bold text-sm">{error}</p>
             <p className="text-[#525252] text-xs mt-2 font-body">Revisa el numero e intenta de nuevo</p>
           </div>
         )}
@@ -79,23 +74,19 @@ export default function Seguimiento() {
                 </span>
               )}
             </div>
-
             <p className="text-[#525252] text-sm font-body">Cliente: {resultado.cliente_nombre}</p>
             <p className="text-[#525252] text-sm font-body">Total: ${resultado.total?.toLocaleString('es-CL')}</p>
             <p className="text-[#525252] text-sm font-body">Tipo: {resultado.tipo_entrega === 'ENVIO_STARKEN' ? 'Envio Starken' : 'Retiro Showroom'}</p>
-
             {resultado.seguimiento_url && (
               <a href={resultado.seguimiento_url} target="_blank" rel="noreferrer"
                  className="btn-primary w-full text-center block text-xs mt-4 flex items-center justify-center gap-2">
-                <TruckIcon />
-                TRACKEAR EN STARKEN
+                <TruckIcon /> TRACKEAR EN STARKEN
               </a>
             )}
-
             {resultado.estado_pedido === 'ENVIADO' && (
-              <div className="glass-card border-amber/10 p-4 text-center">
-                <p className="font-bold text-amber text-xs">Codigo de seguimiento:</p>
-                <p className="font-bold text-lg tracking-wider">{resultado.codigo_seguimiento}</p>
+              <div className="glass-card border-purple/10 p-4 text-center">
+                <p className="font-bold text-purple text-xs">Codigo de seguimiento:</p>
+                <p className="font-bold text-lg tracking-wider font-mono">{resultado.codigo_seguimiento}</p>
               </div>
             )}
           </div>

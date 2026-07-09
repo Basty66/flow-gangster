@@ -1,7 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminLayout({ children }) {
   const location = useLocation();
+  const { isAdmin, logout } = useAuth();
 
   const links = [
     { to: '/admin', label: 'Pedidos' },
@@ -9,14 +11,31 @@ export default function AdminLayout({ children }) {
     { to: '/admin/cupones', label: 'Cupones' },
   ];
 
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen pt-20 pb-16 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="font-bold text-lg text-[#525252]">ACCESO RESTRINGIDO</p>
+          <Link to="/" className="btn-secondary text-sm">VOLVER</Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pt-20 pb-16">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="font-display font-bold text-xl tracking-[0.02em]">Panel Admin</h1>
-          <Link to="/" className="text-[#525252] text-xs font-bold uppercase tracking-[0.15em] hover:text-[#fafafa] transition-colors">
-            Ver Tienda
-          </Link>
+          <h1 className="font-display font-bold text-xl tracking-[-0.02em]">Panel Admin</h1>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="text-[#525252] text-xs font-bold uppercase tracking-[0.15em] hover:text-cyan transition-colors">
+              Ver Tienda
+            </Link>
+            <button onClick={logout}
+                    className="text-[#525252] text-xs font-bold uppercase tracking-[0.15em] hover:text-orange transition-colors">
+              Salir
+            </button>
+          </div>
         </div>
 
         <nav className="flex gap-1 mb-8 border-b border-white/5">
@@ -24,7 +43,7 @@ export default function AdminLayout({ children }) {
             <Link key={link.to} to={link.to}
                   className={`px-5 py-3 font-bold text-xs uppercase tracking-[0.15em] transition-all duration-200 border-b -mb-[1px] ${
                     location.pathname === link.to
-                      ? 'border-accent text-accent'
+                      ? 'border-purple text-purple'
                       : 'border-transparent text-[#525252] hover:text-[#fafafa]'
                   }`}>
               {link.label}

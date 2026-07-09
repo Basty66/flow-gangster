@@ -10,8 +10,8 @@ export default function Footer() {
             <p className="font-display font-extrabold text-base tracking-[0.15em]">FLOW GANGSTER</p>
           </div>
           <p className="text-[#525252] text-sm leading-relaxed max-w-md font-body">
-            Tu tienda de sneakers con estilo urbano. Stock fisico y pedidos por encargo
-            con delivery en todo Chile via Starken.
+            Zapatillas urbanas con estilo. Stock fisico en Melipilla y pedidos por encargo
+            con delivery a todo Chile via Starken.
           </p>
         </div>
 
@@ -23,7 +23,7 @@ export default function Footer() {
               { to: '/seguimiento', label: 'Tracking Starken' },
             ].map((l) => (
               <Link key={l.to} to={l.to}
-                    className="block text-sm text-[#525252] hover:text-[#fafafa] transition-colors font-body">
+                    className="block text-sm text-[#525252] hover:text-cyan transition-colors font-body">
                 {l.label}
               </Link>
             ))}
@@ -43,10 +43,10 @@ export default function Footer() {
       <div className="border-t border-white/5 py-6">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[#525252] text-xs font-body">
-            &copy; 2026 Flow Gangster — Todos los derechos reservados
+            &copy; 2026 Flow Gangster &mdash; Todos los derechos reservados
           </p>
           <div className="flex gap-4 text-[10px] font-medium tracking-[0.15em] uppercase text-[#525252]">
-            <span>React + Vercel + Neon</span>
+            <span>Hecho en Chile</span>
           </div>
         </div>
       </div>
