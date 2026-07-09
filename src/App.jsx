@@ -21,7 +21,7 @@ export default function App() {
   const handleLogoClick = () => {
     const n = logoClicks + 1;
     setLogoClicks(n);
-    if (n >= 7) {
+    if (n >= 5) {
       setLogoClicks(0);
       setShowLogin(true);
     }
