@@ -18,12 +18,11 @@ export default function ProductCard({ producto, index = 0 }) {
   return (
     <Link to={`/producto/${producto.id}`}
           className="card-hover block group animate-fade-up"
-          style={{ animationDelay: `${index * 0.06}s`, opacity: 0 }}>
-      {/* Image */}
-      <div className="relative aspect-[4/5] overflow-hidden">
+          style={{ animationDelay: `${index * 0.05}s`, opacity: 0 }}>
+      <div className="relative aspect-[4/5] overflow-hidden rounded-t-[7px]">
         {imgError ? (
           <div className="w-full h-full flex items-center justify-center bg-surface2">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#525252" strokeWidth="1">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1">
               <circle cx="9" cy="9" r="4"/><path d="M4 20h16"/><path d="M9 16l-5-5 5-5"/><path d="M15 16l5-5-5-5"/>
             </svg>
           </div>
@@ -37,56 +36,43 @@ export default function ProductCard({ producto, index = 0 }) {
           />
         )}
 
-        {/* Top badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {producto.modalidad === 'STOCK' ? (
-            <span className="badge-stock">Instant Drop</span>
+            <span className="tag tag-stock">Instant Drop</span>
           ) : (
-            <span className="badge-preorder">Pre-Order</span>
+            <span className="tag tag-preorder">Pre-Order</span>
           )}
           {isLowStock && (
-            <span className="text-[9px] font-semibold tracking-[0.1em] uppercase px-2 py-0.5 rounded-full bg-orange/10 text-orange border border-orange/20">
+            <span className="tag" style={{ background: 'rgba(245, 158, 11, 0.08)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.15)' }}>
               Ultimos
             </span>
           )}
           {sinStock && (
-            <span className="text-[9px] font-semibold tracking-[0.1em] uppercase px-2 py-0.5 rounded-full bg-neutral-900/80 text-neutral-400 border border-neutral-700">
+            <span className="tag" style={{ background: 'rgba(153, 153, 153, 0.08)', color: '#999', border: '1px solid rgba(153, 153, 153, 0.15)' }}>
               Sin Stock
             </span>
           )}
         </div>
 
-        {/* Delivery time */}
         {producto.modalidad === 'ENCARGO' && producto.tiempo_espera_dias > 0 && (
           <div className="absolute bottom-3 right-3">
-            <span className="text-[9px] font-semibold px-2 py-1 rounded-md bg-neutral-900/80 text-neutral-400 border border-neutral-700">
+            <span className="text-[9px] font-medium px-2 py-1 rounded bg-[#141414] text-[#999] border border-[#2a2a2a]">
               ~{producto.tiempo_espera_dias} dias
             </span>
           </div>
         )}
       </div>
 
-      {/* Info */}
       <div className="p-4 space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-neutral-600 text-[9px] font-medium uppercase tracking-[0.15em]">{producto.marca}</span>
-        </div>
+        <p className="text-[#666] text-[9px] font-medium uppercase tracking-[0.12em]">{producto.marca}</p>
+        <h3 className="font-display font-bold text-sm text-[#f5f5f5]">{producto.nombre}</h3>
 
-        <h3 className="font-display font-bold text-[15px] leading-tight text-white group-hover:text-purple-light transition-colors">
-          {producto.nombre}
-        </h3>
-
-        <p className="text-neutral-600 text-xs leading-relaxed font-body line-clamp-1">
-          {producto.descripcion || 'Zapatillas urbanas'}
-        </p>
-
-        <div className="flex items-center justify-between pt-2">
-          <p className="font-display font-black text-lg tracking-tight text-teal">
+        <div className="flex items-center justify-between pt-2 border-t border-[#2a2a2a]">
+          <p className="font-display font-black text-base text-[#f5f5f5]">
             ${producto.precio.toLocaleString('es-CL')}
           </p>
           {!sinStock && (
-            <span className="text-[9px] font-medium text-neutral-600 flex items-center gap-1 bg-neutral-800/50 px-2 py-1 rounded-md">
-              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 20h16"/><path d="M9 16l-5-5 5-5"/><path d="M15 16l5-5-5-5"/></svg>
+            <span className="text-[9px] font-medium text-[#555]">
               {tallesDisponibles.length} talles
             </span>
           )}
