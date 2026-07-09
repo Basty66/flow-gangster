@@ -1,8 +1,9 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function AdminLayout({ children }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAdmin, logout } = useAuth();
 
   const links = [
@@ -10,6 +11,11 @@ export default function AdminLayout({ children }) {
     { to: '/admin/inventario', label: 'Inventario' },
     { to: '/admin/cupones', label: 'Cupones' },
   ];
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   if (!isAdmin) {
     return (
@@ -23,22 +29,22 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="font-display font-bold text-xl tracking-[-0.02em]">Panel Admin</h1>
+          <h1 className="font-display font-bold text-xl tracking-[-0.02em] text-gradient-purple-cyan">Panel Admin</h1>
           <div className="flex items-center gap-4">
             <Link to="/" className="text-[#525252] text-xs font-bold uppercase tracking-[0.15em] hover:text-cyan transition-colors">
               Ver Tienda
             </Link>
-            <button onClick={logout}
+            <button onClick={handleLogout}
                     className="text-[#525252] text-xs font-bold uppercase tracking-[0.15em] hover:text-orange transition-colors">
               Salir
             </button>
           </div>
         </div>
 
-        <nav className="flex gap-1 mb-8 border-b border-white/5">
+        <nav className="flex gap-1 mb-8 border-b border-white/[0.04]">
           {links.map((link) => (
             <Link key={link.to} to={link.to}
                   className={`px-5 py-3 font-bold text-xs uppercase tracking-[0.15em] transition-all duration-200 border-b -mb-[1px] ${

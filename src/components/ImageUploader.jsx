@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 
-const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_SIZE = 2 * 1024 * 1024;
 
 export default function ImageUploader({ onUpload, currentUrl }) {
   const [preview, setPreview] = useState(currentUrl || '');
@@ -64,8 +64,8 @@ export default function ImageUploader({ onUpload, currentUrl }) {
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onClick={preview ? undefined : handleClick}
-        className={`relative border-2 border-dashed cursor-pointer transition-all duration-300 overflow-hidden
-          ${dragOver ? 'border-neon-cyan bg-neon-cyan/5' : 'border-white/10 hover:border-white/30'}
+        className={`relative border-2 border-dashed cursor-pointer transition-all duration-300 overflow-hidden rounded-2xl
+          ${dragOver ? 'border-purple bg-purple/5' : 'border-white/[0.06] hover:border-white/20'}
           ${preview ? 'h-64' : 'h-48'}`}
       >
         <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
@@ -77,12 +77,12 @@ export default function ImageUploader({ onUpload, currentUrl }) {
                           flex items-center justify-center gap-3">
               <button type="button" onClick={handleClick}
                       className="font-black text-xs tracking-[0.15em] text-white border-2 border-white px-4 py-2
-                               hover:bg-white hover:text-[#0a0118] transition-all">
+                               hover:bg-white hover:text-deep transition-all">
                 CAMBIAR
               </button>
               <button type="button" onClick={handleRemove}
-                      className="font-black text-xs tracking-[0.15em] text-fire-orange border-2 border-fire-orange px-4 py-2
-                               hover:bg-fire-orange hover:text-white transition-all">
+                      className="font-black text-xs tracking-[0.15em] text-orange border-2 border-orange px-4 py-2
+                               hover:bg-orange hover:text-white transition-all">
                 ELIMINAR
               </button>
             </div>
@@ -94,23 +94,23 @@ export default function ImageUploader({ onUpload, currentUrl }) {
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <p className="text-xs font-bold">Click o arrastra una imagen</p>
-            <p className="text-[9px] text-white/20">Máx 2MB · JPG / PNG</p>
+            <p className="text-[9px] text-white/20">Máx 2MB &middot; JPG / PNG</p>
           </div>
         )}
 
         {processing && (
-          <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10">
+          <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10 rounded-2xl">
             <div className="text-center">
-              <div className="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-              <p className="font-black text-xs text-neon-cyan tracking-widest">PROCESANDO...</p>
+              <div className="w-8 h-8 border-2 border-purple border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="font-black text-xs text-purple tracking-widest">PROCESANDO...</p>
             </div>
           </div>
         )}
       </div>
 
-      {error && <p className="text-fire-orange text-xs mt-1 font-bold">{error}</p>}
+      {error && <p className="text-orange text-xs mt-1 font-bold">{error}</p>}
       {preview && !error && (
-        <p className="text-neon-cyan text-xs mt-1 font-bold tracking-wider">✓ IMAGEN LISTA</p>
+        <p className="text-cyan text-xs mt-1 font-bold tracking-wider">✓ IMAGEN LISTA</p>
       )}
     </div>
   );

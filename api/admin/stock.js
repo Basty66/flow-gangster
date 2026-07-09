@@ -1,6 +1,9 @@
 import getPool from '../db.js';
+import { verifyAdmin } from './_verify.js';
 
 export default async function handler(req, res) {
+  if (!verifyAdmin(req, res)) return;
+
   if (req.method !== 'PUT') {
     res.setHeader('Allow', ['PUT']);
     return res.status(405).json({ error: 'Method not allowed' });

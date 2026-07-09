@@ -1,6 +1,9 @@
 import getPool from '../db.js';
+import { verifyAdmin } from './_verify.js';
 
 export default async function handler(req, res) {
+  if (!verifyAdmin(req, res)) return;
+
   if (req.method === 'GET') {
     const { estado } = req.query;
     try {
@@ -58,7 +61,6 @@ export default async function handler(req, res) {
       throw { status: 404, message: 'Pedido no encontrado' };
     }
 
-    // Si se cancela, devolver stock si era modalidad STOCK
     if (estado_pedido === 'CANCELADO') {
       const detalles = await client.query(
         `SELECT dp.producto_id, dp.talle, dp.cantidad, p.modalidad

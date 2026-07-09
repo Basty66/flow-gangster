@@ -1,14 +1,8 @@
 import { useState } from 'react';
 
 const SearchIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-  </svg>
-);
-
-const TruckIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
   </svg>
 );
 
@@ -18,75 +12,123 @@ export default function Seguimiento() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const buscar = async () => {
-    if (!pedidoId) return;
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!pedidoId.trim()) return;
     setLoading(true);
     setError('');
     setResultado(null);
     try {
-      const res = await fetch(`/api/seguimiento?pedido_id=${pedidoId}`);
+      const res = await fetch(`/api/seguimiento?pedido_id=${pedidoId.trim()}`);
       const data = await res.json();
-      if (res.ok) { setResultado(data); }
-      else { setError(data.error); }
-    } catch { setError('Error al consultar'); }
+      if (res.ok) setResultado(data);
+      else setError(data.error || 'Pedido no encontrado');
+    } catch {
+      setError('Error de conexion');
+    }
     setLoading(false);
   };
 
-  const estados = {
-    PENDIENTE_PAGO: { label: 'Pendiente de Pago', color: 'text-orange' },
-    PAGADO: { label: 'Pagado - En Preparacion', color: 'text-purple' },
-    ENVIADO: { label: 'Enviado', color: 'text-cyan' },
-    CANCELADO: { label: 'Cancelado', color: 'text-red-400' },
+  const estadoConfig = {
+    PENDIENTE_PAGO: { label: 'Pendiente de Pago', color: 'text-orange', bar: 'bg-orange', width: 'w-1/4' },
+    PAGADO: { label: 'Pagado / En Preparacion', color: 'text-purple', bar: 'bg-purple', width: 'w-2/4' },
+    ENVIADO: { label: 'Enviado', color: 'text-cyan', bar: 'bg-cyan', width: 'w-3/4' },
+    CANCELADO: { label: 'Cancelado', color: 'text-red-400', bar: 'bg-red-400', width: 'w-full' },
   };
 
+  const estado = estadoConfig[resultado?.estado_pedido] || { label: 'Desconocido', color: 'text-[#525252]', bar: 'bg-[#525252]', width: 'w-0' };
+
   return (
-    <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
-      <div className="max-w-lg mx-auto px-4 w-full">
-        <div className="text-center mb-10">
-          <h1 className="font-display font-extrabold text-3xl mb-4 tracking-[-0.02em]">TRACKING</h1>
-          <p className="text-[#525252] text-sm font-body">Ingresa tu numero de pedido para ver el estado</p>
+    <div className="min-h-screen pt-28 pb-24">
+      <div className="max-w-2xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-[-0.02em] mb-3 text-gradient-purple-cyan">
+            TRACKEAR PEDIDO
+          </h1>
+          <p className="text-[#525252] text-sm font-body">Ingresa tu numero de pedido para ver el estado de envio</p>
         </div>
 
-        <div className="flex gap-3 mb-8">
-          <input value={pedidoId} onChange={(e) => setPedidoId(e.target.value)}
-                 placeholder="ID del pedido (ej: abc123...)"
-                 className="input-field flex-1 text-xs font-mono" />
-          <button onClick={buscar} disabled={loading}
-                  className="btn-primary text-[10px] px-5 py-3">
-            {loading ? '...' : 'BUSCAR'}
-          </button>
-        </div>
+        <form onSubmit={handleSearch} className="max-w-md mx-auto mb-12">
+          <div className="relative">
+            <input value={pedidoId} onChange={(e) => setPedidoId(e.target.value)}
+                   placeholder="Numero de pedido (UUID)"
+                   className="input-field pr-12 font-mono text-sm tracking-wider text-center h-14 rounded-2xl bg-white/[0.02] border-white/[0.06] focus:border-purple/30" />
+            <button type="submit" disabled={loading}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center
+                             text-[#525252] hover:text-cyan hover:bg-white/[0.06] transition-all duration-300 disabled:opacity-50">
+              {loading ? (
+                <div className="w-4 h-4 border border-purple border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <SearchIcon />
+              )}
+            </button>
+          </div>
+        </form>
 
         {error && (
-          <div className="glass-card p-6 text-center animate-fade-in">
-            <p className="text-orange font-bold text-sm">{error}</p>
-            <p className="text-[#525252] text-xs mt-2 font-body">Revisa el numero e intenta de nuevo</p>
+          <div className="text-center animate-fade-in">
+            <div className="liquid-card p-8 max-w-md mx-auto border-red-400/10">
+              <p className="text-orange font-bold text-sm">{error}</p>
+              <p className="text-[#525252] text-xs mt-2 font-body">Verifica el numero e intenta nuevamente</p>
+            </div>
           </div>
         )}
 
         {resultado && (
-          <div className="glass-card p-6 space-y-4 animate-scale-in">
-            <div className="flex items-center justify-between">
-              <h2 className="font-bold text-base">Pedido #{resultado.id?.slice(0, 8)}</h2>
-              {resultado.estado_pedido && (
-                <span className={`font-bold text-xs uppercase tracking-wider ${estados[resultado.estado_pedido]?.color || 'text-[#525252]'}`}>
-                  {estados[resultado.estado_pedido]?.label || resultado.estado_pedido}
+          <div className="animate-fade-up space-y-6">
+            <div className="liquid-card p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <p className="text-[#525252] text-xs font-body">Numero de Pedido</p>
+                  <p className="font-mono font-bold text-lg text-[#fafafa]">#{resultado.id?.slice(0, 8).toUpperCase()}</p>
+                </div>
+                <span className={`font-bold text-xs uppercase tracking-wider px-4 py-2 rounded-full border ${estado.color} ${estado.color.replace('text', 'border')}/20 bg-white/[0.02]`}>
+                  {estado.label}
                 </span>
-              )}
+              </div>
+
+              {/* Progress bar */}
+              <div className="w-full h-1.5 rounded-full bg-white/[0.04] overflow-hidden mb-4">
+                <div className={`h-full rounded-full transition-all duration-1000 ${estado.bar} ${estado.width}`} />
+              </div>
+
+              <div className="flex justify-between text-[10px] font-medium text-[#525252] uppercase tracking-wider">
+                <span>Pedido</span>
+                <span>Pagado</span>
+                <span>Enviado</span>
+                <span>Entregado</span>
+              </div>
             </div>
-            <p className="text-[#525252] text-sm font-body">Cliente: {resultado.cliente_nombre}</p>
-            <p className="text-[#525252] text-sm font-body">Total: ${resultado.total?.toLocaleString('es-CL')}</p>
-            <p className="text-[#525252] text-sm font-body">Tipo: {resultado.tipo_entrega === 'ENVIO_STARKEN' ? 'Envio Starken' : 'Retiro Showroom'}</p>
+
+            <div className="liquid-card p-8 space-y-4">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p className="text-[#525252] text-xs font-body">Cliente</p>
+                  <p className="font-bold text-sm text-[#fafafa]">{resultado.cliente_nombre}</p>
+                </div>
+                <div>
+                  <p className="text-[#525252] text-xs font-body">Total</p>
+                  <p className="font-bold text-sm text-cyan">${resultado.total?.toLocaleString('es-CL')}</p>
+                </div>
+                <div>
+                  <p className="text-[#525252] text-xs font-body">Entrega</p>
+                  <p className="font-bold text-sm text-[#fafafa]">{resultado.tipo_entrega === 'ENVIO_STARKEN' ? 'Envio Starken' : 'Retiro Showroom'}</p>
+                </div>
+                <div>
+                  <p className="text-[#525252] text-xs font-body">Fecha</p>
+                  <p className="font-bold text-sm text-[#fafafa]">{resultado.created_at ? new Date(resultado.created_at).toLocaleDateString('es-CL') : '-'}</p>
+                </div>
+              </div>
+            </div>
+
             {resultado.seguimiento_url && (
-              <a href={resultado.seguimiento_url} target="_blank" rel="noreferrer"
-                 className="btn-primary w-full text-center block text-xs mt-4 flex items-center justify-center gap-2">
-                <TruckIcon /> TRACKEAR EN STARKEN
-              </a>
-            )}
-            {resultado.estado_pedido === 'ENVIADO' && (
-              <div className="glass-card border-purple/10 p-4 text-center">
-                <p className="font-bold text-purple text-xs">Codigo de seguimiento:</p>
-                <p className="font-bold text-lg tracking-wider font-mono">{resultado.codigo_seguimiento}</p>
+              <div className="liquid-card p-8 text-center border-cyan/10">
+                <p className="font-bold text-xs uppercase tracking-[0.15em] text-cyan mb-4">Seguimiento Starken</p>
+                <a href={resultado.seguimiento_url} target="_blank" rel="noopener noreferrer"
+                   className="btn-primary text-sm inline-flex items-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                  RASTREAR EN STARKEN
+                </a>
               </div>
             )}
           </div>

@@ -32,7 +32,7 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
-        <div className="w-8 h-8 border border-purple border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border border-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -40,7 +40,7 @@ export default function ProductDetail() {
   if (!producto) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center pt-20 gap-6">
-        <p className="font-display font-extrabold text-6xl text-white/5">404</p>
+        <p className="font-display font-extrabold text-8xl text-white/[0.03] tracking-[-0.03em]">404</p>
         <p className="font-bold text-lg text-[#525252]">PRODUCTO NO ENCONTRADO</p>
         <Link to="/" className="btn-primary text-sm">VOLVER A TIENDA</Link>
       </div>
@@ -61,31 +61,29 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="pt-24 pb-16">
+    <div className="pt-28 pb-24">
       <div className="max-w-7xl mx-auto px-4">
         <Link to="/" className="inline-flex items-center gap-2 font-bold text-xs tracking-[0.15em] uppercase
-                                text-[#525252] hover:text-cyan transition-colors mb-8 group">
+                                text-[#525252] hover:text-cyan transition-colors mb-10 group">
           <ArrowLeftIcon />
           VOLVER
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-          <div className="glass-card aspect-square overflow-hidden animate-scale-in">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
+          <div className="liquid-card aspect-square overflow-hidden animate-scale-in group">
             {imgError ? (
               <div className="w-full h-full flex items-center justify-center">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#525252" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="9" cy="9" r="4"/><path d="M4 20h16"/><path d="M9 16l-5-5 5-5"/><path d="M15 16l5-5-5-5"/>
-                </svg>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#525252" strokeWidth="1"><circle cx="9" cy="9" r="4"/><path d="M4 20h16"/><path d="M9 16l-5-5 5-5"/><path d="M15 16l5-5-5-5"/></svg>
               </div>
             ) : (
               <img src={producto.imagen_url} alt={producto.nombre}
-                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                    onError={() => setImgError(true)} />
             )}
           </div>
 
           <div className="space-y-8 animate-fade-up" style={{ animationDelay: '0.2s', opacity: 0 }}>
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center gap-3">
                 {producto.modalidad === 'STOCK' ? (
                   <span className="badge-stock">INSTANT DROP</span>
@@ -95,17 +93,17 @@ export default function ProductDetail() {
                 <span className="text-[#525252] text-[10px] font-medium tracking-[0.15em] uppercase">{producto.marca}</span>
               </div>
 
-              <h1 className="font-display font-extrabold text-4xl md:text-5xl leading-none tracking-[-0.02em] text-glow">
+              <h1 className="font-display font-extrabold text-4xl md:text-6xl leading-none tracking-[-0.02em] text-gradient-iris">
                 {producto.nombre}
               </h1>
 
-              <p className="font-display font-extrabold text-3xl text-cyan">
+              <p className="font-display font-extrabold text-4xl text-cyan">
                 ${producto.precio.toLocaleString('es-CL')}
               </p>
             </div>
 
             {producto.modalidad === 'ENCARGO' && (
-              <div className="glass-card p-6 border-orange/10">
+              <div className="liquid-card p-6 border-orange/10">
                 <p className="font-bold text-orange uppercase text-xs tracking-[0.15em] mb-2">ARTICULO BAJO PEDIDO</p>
                 <p className="text-[#525252] text-sm leading-relaxed">
                   Este modelo se importa exclusivamente para ti. Tiempo estimado:{' '}
@@ -122,10 +120,10 @@ export default function ProductDetail() {
               <div className="grid grid-cols-5 sm:grid-cols-7 gap-2">
                 {tallesDisponibles.map((t) => (
                   <button key={t.talle} onClick={() => setTalleSeleccionado(t.talle)}
-                          className={`py-3.5 border font-bold text-sm transition-all duration-300 ${
+                          className={`py-4 border font-bold text-sm transition-all duration-300 rounded-xl ${
                             talleSeleccionado === t.talle
-                              ? 'border-purple text-purple bg-purple/5'
-                              : 'border-white/10 text-[#525252] hover:border-white/30 hover:text-white/70'
+                              ? 'border-purple text-purple bg-purple/5 shadow-lg shadow-purple/10'
+                              : 'border-white/[0.06] text-[#525252] hover:border-white/20 hover:text-white/70 bg-white/[0.02]'
                           }`}>
                     {t.talle}
                   </button>
@@ -135,12 +133,12 @@ export default function ProductDetail() {
 
             <div className="flex items-center gap-6">
               <p className="font-bold text-xs tracking-[0.15em] uppercase text-[#525252]">Cantidad</p>
-              <div className="flex items-center border border-white/10">
+              <div className="flex items-center rounded-xl border border-white/[0.06] overflow-hidden">
                 <button onClick={() => setCantidad(Math.max(1, cantidad - 1))}
-                        className="w-11 h-11 font-bold text-base hover:bg-white/10 transition-colors flex items-center justify-center">-</button>
-                <span className="w-11 h-11 font-bold text-base flex items-center justify-center border-x border-white/10">{cantidad}</span>
+                        className="w-12 h-12 font-bold text-base hover:bg-white/[0.06] transition-colors flex items-center justify-center">-</button>
+                <span className="w-12 h-12 font-bold text-base flex items-center justify-center border-x border-white/[0.06] bg-white/[0.02]">{cantidad}</span>
                 <button onClick={() => setCantidad(cantidad + 1)}
-                        className="w-11 h-11 font-bold text-base hover:bg-white/10 transition-colors flex items-center justify-center">+</button>
+                        className="w-12 h-12 font-bold text-base hover:bg-white/[0.06] transition-colors flex items-center justify-center">+</button>
               </div>
             </div>
 
@@ -151,14 +149,14 @@ export default function ProductDetail() {
                   {stockTalle.cantidad} pares disponibles
                 </span>
                 {parseInt(stockTalle.cantidad) <= 2 && (
-                  <span className="text-orange font-bold ml-2">ULTIMOS!</span>
+                  <span className="text-orange font-bold ml-2 animate-pulse">ULTIMOS!</span>
                 )}
               </p>
             )}
 
             <button onClick={handleAdd} disabled={!talleSeleccionado}
-                    className={`btn-primary w-full text-center text-sm ${added ? 'bg-purple' : ''}`}>
-              {added ? 'AGREGADO AL CARRITO' : !talleSeleccionado ? 'SELECCIONA UN TALLE' : 'AGREGAR AL CARRITO'}
+                    className={`btn-primary w-full text-center text-sm ${added ? 'bg-gradient-to-r from-cyan to-purple' : ''}`}>
+              {added ? '✓ AGREGADO AL CARRITO' : !talleSeleccionado ? 'SELECCIONA UN TALLE' : 'AGREGAR AL CARRITO'}
             </button>
 
             {added && (
@@ -166,7 +164,7 @@ export default function ProductDetail() {
                     className="block text-center text-cyan font-bold text-xs tracking-wider
                              underline underline-offset-4 decoration-cyan/30 hover:decoration-cyan
                              transition-all uppercase">
-                IR AL CARRITO
+                IR AL CARRITO &rarr;
               </Link>
             )}
           </div>

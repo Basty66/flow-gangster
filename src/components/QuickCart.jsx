@@ -50,16 +50,14 @@ export default function QuickCart() {
     if (!cupon) return;
     setCuponMsg('Validando...');
     try {
-      const res = await fetch('/api/cupones', {
+      const res = await fetch('/api/validar-cupon', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codigo: cupon, tipo: 'VALIDAR' }),
+        body: JSON.stringify({ codigo: cupon, total_actual: totalPrecio }),
       });
       const data = await res.json();
       if (res.ok) {
-        setDescuento(data.tipo === 'PERCENT'
-          ? Math.round((totalPrecio * data.valor) / 100)
-          : data.valor);
+        setDescuento(data.descuento);
         setCuponMsg(`${data.valor}${data.tipo === 'PERCENT' ? '%' : '$'} off aplicado`);
       } else {
         setDescuento(0);
@@ -95,7 +93,7 @@ export default function QuickCart() {
               </div>
             ) : (
               items.map((item, idx) => (
-                <div key={idx} className="glass-card p-3 flex gap-3 animate-fade-in" style={{ animationDelay: `${idx * 0.05}s` }}>
+                <div key={idx} className="liquid-card p-3 flex gap-3 animate-fade-in" style={{ animationDelay: `${idx * 0.05}s` }}>
                   <img src={item.producto.imagen_url} alt={item.producto.nombre}
                        className="w-20 h-20 object-cover border border-white/5 flex-shrink-0"
                        onError={(e) => { e.target.style.display = 'none'; }} />
@@ -161,10 +159,10 @@ export default function QuickCart() {
       </div>
 
       <button onClick={() => setOpen(true)}
-              className="fixed bottom-6 right-6 z-40 bg-purple text-white
-                         font-bold px-5 py-3 text-xs uppercase tracking-[0.15em]
-                         hover:bg-purple/80 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]
-                         transition-all duration-300 animate-fade-in shadow-lg"
+              className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-purple to-purpledark text-white
+                         font-bold px-5 py-3.5 text-xs uppercase tracking-[0.15em]
+                         hover:shadow-[0_0_40px_rgba(139,92,246,0.3)] hover:scale-105
+                         transition-all duration-300 animate-fade-in shadow-2xl rounded-2xl border border-purple/20"
               style={{ opacity: items.length === 0 ? 0.5 : 1 }}>
         <span className="flex items-center gap-2">
           <CartBagIcon />

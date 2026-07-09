@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import AdminLayout from '../../components/AdminLayout';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Coupons() {
+  const { getAuthHeaders } = useAuth();
   const [form, setForm] = useState({ codigo: '', tipo: 'PERCENT', valor: '', fecha_expiracion: '', limite_usos: '' });
   const [msg, setMsg] = useState({ type: '', text: '' });
 
@@ -10,7 +12,7 @@ export default function Coupons() {
     setMsg({ type: '', text: '' });
     try {
       const res = await fetch('/api/cupones', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ ...form, valor: parseInt(form.valor), limite_usos: parseInt(form.limite_usos) }),
       });
       if (res.ok) {

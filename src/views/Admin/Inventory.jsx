@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import ImageUploader from '../../components/ImageUploader';
+import { useAuth } from '../../context/AuthContext';
 
 const TALLES = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
 
@@ -12,6 +13,7 @@ const MinusIcon = () => (
 );
 
 export default function Inventory() {
+  const { getAuthHeaders } = useAuth();
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -24,9 +26,9 @@ export default function Inventory() {
   const fetchProductos = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/productos');
+      const res = await fetch('/api/admin/productos', { headers: { ...getAuthHeaders() } });
       const data = await res.json();
-      setProductos(data);
+      if (res.ok) setProductos(data);
     } catch (e) { console.error(e); }
     setLoading(false);
   };
@@ -36,7 +38,7 @@ export default function Inventory() {
   const updateStock = async (producto_id, talle, operacion) => {
     try {
       await fetch('/api/admin/stock', {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ producto_id, talle, operacion }),
       });
       fetchProductos();
@@ -48,7 +50,7 @@ export default function Inventory() {
     if (!form.imagen_url) return alert('Debes subir una imagen');
     try {
       const res = await fetch('/api/admin/productos', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           ...form, precio: parseInt(form.precio),
           tiempo_espera_dias: form.modalidad === 'ENCARGO' ? parseInt(form.tiempo_espera_dias) : 0,
@@ -71,7 +73,7 @@ export default function Inventory() {
       </button>
 
       {showForm && (
-        <form onSubmit={createProducto} className="glass-card p-8 mb-10 space-y-6 animate-fade-in">
+        <form onSubmit={createProducto} className="liquid-card p-8 mb-10 space-y-6 animate-fade-in">
           <h2 className="font-display font-bold text-lg tracking-[-0.02em]">Nuevo Producto</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
@@ -130,7 +132,7 @@ export default function Inventory() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {productos.map((p) => (
-            <div key={p.id} className="glass-card overflow-hidden group transition-all duration-300">
+            <div key={p.id} className="liquid-card overflow-hidden group transition-all duration-300">
               <div className="flex">
                 <div className="w-28 h-28 flex-shrink-0 overflow-hidden bg-surface">
                   <img src={p.imagen_url} alt={p.nombre}

@@ -8,6 +8,12 @@ const CheckIcon = () => (
   </svg>
 );
 
+const steps = [
+  { n: 1, label: 'DATOS' },
+  { n: 2, label: 'RESUMEN' },
+  { n: 3, label: 'PAGO' },
+];
+
 export default function Checkout() {
   const { items, totalPrecio, clearCart } = useCart();
   const navigate = useNavigate();
@@ -51,93 +57,100 @@ export default function Checkout() {
         cupon_codigo: form.cupon || undefined,
       };
       const res = await fetch('/api/pedidos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error); setSubmitting(false); return; }
-      setResultado(data);
-      clearCart();
-      setStep(4);
-    } catch { setError('Error al procesar. Intenta de nuevo.'); }
+      if (res.ok) {
+        setResultado(data);
+        clearCart();
+        setStep(3);
+      } else {
+        setError(data.error || 'Error al procesar el pedido');
+      }
+    } catch {
+      setError('Error de conexion');
+    }
     setSubmitting(false);
   };
 
   if (items.length === 0 && !resultado) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center pt-20 gap-4">
-        <p className="font-bold text-2xl tracking-[-0.02em]">CARRITO VACIO</p>
-        <Link to="/" className="btn-primary text-sm">IR A LA TIENDA</Link>
+      <div className="min-h-screen pt-28 pb-16 flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 rounded-full border border-white/[0.06] flex items-center justify-center mx-auto bg-white/[0.02]">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </div>
+          <p className="font-bold text-lg text-[#525252]">Tu carrito esta vacio</p>
+          <Link to="/" className="btn-primary text-sm">IR A TIENDA</Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="pt-24 pb-16">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="flex items-center justify-center gap-2 mb-12">
-          {[1, 2, 3].map((s) => (
-            <div key={s} className="flex items-center">
-              <div className={`stepper-dot ${step >= s ? 'border-purple text-purple' : 'border-white/10 text-[#525252]'}`}>
-                {step > s ? <CheckIcon /> : s}
+    <div className="pt-28 pb-24">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Stepper */}
+        <div className="flex items-center justify-center gap-4 mb-16">
+          {steps.map((s, i) => (
+            <div key={s.n} className="flex items-center gap-4">
+              <div className={`flex items-center gap-3 ${step >= s.n ? 'text-purple' : 'text-[#525252]'}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                  step > s.n
+                    ? 'bg-purple text-white'
+                    : step === s.n
+                    ? 'bg-purple/10 text-purple border border-purple/30'
+                    : 'border border-white/[0.06] text-[#525252]'
+                }`}>
+                  {step > s.n ? <CheckIcon /> : s.n}
+                </div>
+                <span className="hidden sm:block font-bold text-xs uppercase tracking-[0.15em]">{s.label}</span>
               </div>
-              {s < 3 && <div className={`w-10 h-[1px] ${step > s ? 'bg-purple' : 'bg-white/10'}`} />}
+              {i < steps.length - 1 && (
+                <div className={`w-12 h-[1px] transition-all duration-300 ${step > s.n ? 'bg-purple/50' : 'bg-white/[0.06]'}`} />
+              )}
             </div>
           ))}
         </div>
 
+        {/* Step 1: Form */}
         {step === 1 && (
-          <div className="space-y-6 animate-fade-in">
-            <h1 className="font-display font-bold text-2xl tracking-[-0.02em]">RESUMEN DEL PEDIDO</h1>
-            <div className="space-y-3">
-              {items.map((item, idx) => (
-                <div key={idx} className="glass-card p-4 flex justify-between items-center">
-                  <div className="flex items-center gap-4">
-                    <img src={item.producto.imagen_url} alt={item.producto.nombre}
-                         className="w-14 h-14 object-cover border border-white/5 flex-shrink-0"
-                         onError={(e) => { e.target.style.display = 'none'; }} />
-                    <div>
-                      <p className="font-bold text-sm">{item.producto.nombre}</p>
-                      <p className="text-[#525252] text-xs">Talle: {item.talle} x {item.cantidad}</p>
-                    </div>
-                  </div>
-                  <p className="font-bold text-sm text-cyan">${(item.producto.precio * item.cantidad).toLocaleString('es-CL')}</p>
-                </div>
-              ))}
-            </div>
-            <div className="text-right">
-              <p className="text-[#525252] text-sm">Subtotal: ${totalPrecio.toLocaleString('es-CL')}</p>
-              <p className="font-display font-extrabold text-xl text-cyan">TOTAL: ${totalPrecio.toLocaleString('es-CL')}</p>
-            </div>
-            <button onClick={() => setStep(2)} className="btn-primary w-full">CONTINUAR</button>
-          </div>
-        )}
+          <div className="max-w-xl mx-auto animate-fade-up space-y-8">
+            <div className="liquid-card p-8 space-y-5">
+              <h2 className="font-display font-bold text-lg tracking-[-0.02em] text-[#fafafa]">Tus Datos</h2>
 
-        {step === 2 && (
-          <div className="space-y-6 animate-fade-in">
-            <h1 className="font-display font-bold text-2xl tracking-[-0.02em]">TUS DATOS</h1>
-            <div className="space-y-4">
-              <input value={form.nombre} onChange={(e) => update('nombre', e.target.value)}
-                     placeholder="Nombre completo *" className="input-field" />
-              <input value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value)}
-                     placeholder="WhatsApp +56 *" className="input-field" />
-              <div>
-                <p className="font-bold uppercase text-xs tracking-[0.15em] text-[#525252] mb-3">Tipo de entrega</p>
-                <div className="flex gap-3">
-                  <button onClick={() => update('tipo_entrega', 'RETIRAR_SHOWROOM')}
-                          className={`flex-1 py-3.5 border font-bold text-xs uppercase tracking-wider transition-all ${form.tipo_entrega === 'RETIRAR_SHOWROOM' ? 'border-purple text-purple' : 'border-white/10 text-[#525252] hover:border-white/30'}`}>
-                    RETIRO EN SHOWROOM
-                  </button>
-                  <button onClick={() => update('tipo_entrega', 'ENVIO_STARKEN')}
-                          className={`flex-1 py-3.5 border font-bold text-xs uppercase tracking-wider transition-all ${form.tipo_entrega === 'ENVIO_STARKEN' ? 'border-purple text-purple' : 'border-white/10 text-[#525252] hover:border-white/30'}`}>
-                    ENVIO STARKEN
-                  </button>
-                </div>
+              <div className="space-y-4">
+                <input value={form.nombre} onChange={(e) => update('nombre', e.target.value)}
+                       placeholder="Nombre completo *" className="input-field" />
+                <input value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value)}
+                       placeholder="WhatsApp (Ej: +56912345678) *" className="input-field" />
               </div>
+            </div>
+
+            <div className="liquid-card p-8 space-y-5">
+              <h2 className="font-display font-bold text-lg tracking-[-0.02em] text-[#fafafa]">Entrega</h2>
+
+              <div className="flex gap-3">
+                <button onClick={() => update('tipo_entrega', 'RETIRAR_SHOWROOM')}
+                        className={`flex-1 py-4 rounded-xl border font-bold text-xs uppercase tracking-wider transition-all ${
+                          form.tipo_entrega === 'RETIRAR_SHOWROOM'
+                            ? 'border-purple text-purple bg-purple/5 shadow-lg shadow-purple/10'
+                            : 'border-white/[0.06] text-[#525252] hover:border-white/20'
+                        }`}>
+                  RETIRO SHOWROOM
+                </button>
+                <button onClick={() => update('tipo_entrega', 'ENVIO_STARKEN')}
+                        className={`flex-1 py-4 rounded-xl border font-bold text-xs uppercase tracking-wider transition-all ${
+                          form.tipo_entrega === 'ENVIO_STARKEN'
+                            ? 'border-purple text-purple bg-purple/5 shadow-lg shadow-purple/10'
+                            : 'border-white/[0.06] text-[#525252] hover:border-white/20'
+                        }`}>
+                  ENVIO STARKEN
+                </button>
+              </div>
+
               {form.tipo_entrega === 'ENVIO_STARKEN' && (
-                <div className="glass-card p-5 space-y-4 animate-fade-in">
-                  <p className="font-bold uppercase text-xs tracking-wider text-purple">Direccion de envio</p>
+                <div className="space-y-4 animate-fade-in">
                   <input value={form.region} onChange={(e) => update('region', e.target.value)}
                          placeholder="Region" className="input-field" />
                   <input value={form.comuna} onChange={(e) => update('comuna', e.target.value)}
@@ -146,81 +159,142 @@ export default function Checkout() {
                          placeholder="Direccion completa *" className="input-field" />
                 </div>
               )}
-              <div>
-                <p className="font-bold uppercase text-xs tracking-[0.15em] text-[#525252] mb-3">Metodo de pago</p>
-                <div className="flex gap-3">
-                  <button onClick={() => update('metodo_pago', 'TRANSFERENCIA')}
-                          className={`flex-1 py-3.5 border font-bold text-xs uppercase tracking-wider transition-all ${form.metodo_pago === 'TRANSFERENCIA' ? 'border-purple text-purple' : 'border-white/10 text-[#525252] hover:border-white/30'}`}>
-                    TRANSFERENCIA
-                  </button>
-                  <button onClick={() => update('metodo_pago', 'EFECTIVO')}
-                          className={`flex-1 py-3.5 border font-bold text-xs uppercase tracking-wider transition-all ${form.metodo_pago === 'EFECTIVO' ? 'border-purple text-purple' : 'border-white/10 text-[#525252] hover:border-white/30'}`}>
-                    EFECTIVO
-                  </button>
-                </div>
-              </div>
-              <input value={form.cupon} onChange={(e) => update('cupon', e.target.value.toUpperCase())}
-                     placeholder="Cupon de descuento (opcional)" className="input-field uppercase text-xs" />
             </div>
-            {error && <p className="text-orange font-bold text-xs">{error}</p>}
-            <div className="flex gap-3">
-              <button onClick={() => setStep(1)} className="btn-secondary flex-1">ATRAS</button>
-              <button onClick={() => setStep(3)} className="btn-primary flex-1">REVISAR PEDIDO</button>
+
+            <div className="liquid-card p-8 space-y-5">
+              <h2 className="font-display font-bold text-lg tracking-[-0.02em] text-[#fafafa]">Pago</h2>
+
+              <div className="flex gap-3">
+                <button onClick={() => update('metodo_pago', 'TRANSFERENCIA')}
+                        className={`flex-1 py-4 rounded-xl border font-bold text-xs uppercase tracking-wider transition-all ${
+                          form.metodo_pago === 'TRANSFERENCIA'
+                            ? 'border-purple text-purple bg-purple/5 shadow-lg shadow-purple/10'
+                            : 'border-white/[0.06] text-[#525252] hover:border-white/20'
+                        }`}>
+                  TRANSFERENCIA
+                </button>
+                <button onClick={() => update('metodo_pago', 'EFECTIVO')}
+                        className={`flex-1 py-4 rounded-xl border font-bold text-xs uppercase tracking-wider transition-all ${
+                          form.metodo_pago === 'EFECTIVO'
+                            ? 'border-purple text-purple bg-purple/5 shadow-lg shadow-purple/10'
+                            : 'border-white/[0.06] text-[#525252] hover:border-white/20'
+                        }`}>
+                  EFECTIVO
+                </button>
+              </div>
+
+              {form.metodo_pago === 'TRANSFERENCIA' && (
+                <div className="bg-white/[0.02] rounded-xl p-5 space-y-2 border border-white/[0.04] animate-fade-in">
+                  <p className="font-bold text-xs uppercase tracking-[0.15em] text-cyan">Datos Bancarios</p>
+                  <div className="font-mono text-sm text-[#525252] space-y-1">
+                    <p>Banco: Flow Gangster Bank</p>
+                    <p>Tipo: Cuenta Corriente</p>
+                    <p>Alias: FLOW.GANGSTER</p>
+                    <p>RUT: 00.000.000-0</p>
+                  </div>
+                  <p className="text-[10px] text-[#525252] mt-2 font-body">Envia el comprobante por WhatsApp para confirmar tu pedido.</p>
+                </div>
+              )}
+            </div>
+
+            {error && <p className="text-orange text-sm font-bold text-center">{error}</p>}
+
+            <div className="text-center">
+              <button onClick={() => setStep(2)} disabled={!form.nombre || !form.whatsapp}
+                      className="btn-primary text-sm">
+                CONTINUAR AL RESUMEN
+              </button>
             </div>
           </div>
         )}
 
-        {step === 3 && (
-          <div className="space-y-6 animate-fade-in">
-            <h1 className="font-display font-bold text-2xl tracking-[-0.02em]">CONFIRMAR PEDIDO</h1>
-            <div className="glass-card p-5 space-y-2">
-              <p><span className="text-[#525252] text-sm">Nombre:</span> <span className="font-bold">{form.nombre}</span></p>
-              <p><span className="text-[#525252] text-sm">WhatsApp:</span> <span className="font-bold">{form.whatsapp}</span></p>
-              <p><span className="text-[#525252] text-sm">Entrega:</span> <span className="font-bold">{form.tipo_entrega === 'RETIRAR_SHOWROOM' ? 'Retiro en Showroom' : 'Envio Starken'}</span></p>
-              {form.tipo_entrega === 'ENVIO_STARKEN' && <p><span className="text-[#525252] text-sm">Direccion:</span> <span className="font-bold">{form.direccion}</span></p>}
-              <p><span className="text-[#525252] text-sm">Pago:</span> <span className="font-bold">{form.metodo_pago === 'TRANSFERENCIA' ? 'Transferencia' : 'Efectivo'}</span></p>
-              {form.cupon && <p><span className="text-[#525252] text-sm">Cupon:</span> <span className="font-bold text-purple">{form.cupon}</span></p>}
+        {/* Step 2: Summary */}
+        {step === 2 && (
+          <div className="max-w-xl mx-auto animate-fade-up space-y-8">
+            <div className="liquid-card p-8 space-y-4">
+              <h2 className="font-display font-bold text-lg tracking-[-0.02em] text-[#fafafa]">Resumen del Pedido</h2>
+
+              <div className="space-y-3">
+                {items.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-4 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                    <img src={item.producto.imagen_url} alt={item.producto.nombre}
+                         className="w-16 h-16 object-cover rounded-lg border border-white/[0.04]"
+                         onError={(e) => { e.target.style.display = 'none'; }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm truncate">{item.producto.nombre}</p>
+                      <p className="text-[#525252] text-xs">Talle: {item.talle} x {item.cantidad}</p>
+                      <p className="text-cyan font-bold text-sm mt-1">${(item.producto.precio * item.cantidad).toLocaleString('es-CL')}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t border-white/[0.04] pt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#525252]">Subtotal</span>
+                  <span className="text-[#fafafa] font-bold">${totalPrecio.toLocaleString('es-CL')}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold pt-2 border-t border-white/[0.04]">
+                  <span>TOTAL</span>
+                  <span className="text-cyan">${totalPrecio.toLocaleString('es-CL')}</span>
+                </div>
+              </div>
             </div>
-            <div className="glass-card p-5">
-              <p className="font-display font-extrabold text-2xl text-cyan">TOTAL: ${totalPrecio.toLocaleString('es-CL')}</p>
-            </div>
-            {error && <p className="text-orange font-bold text-xs">{error}</p>}
-            <div className="flex gap-3">
-              <button onClick={() => setStep(2)} className="btn-secondary flex-1">ATRAS</button>
-              <button onClick={handleSubmit} disabled={submitting} className="btn-primary flex-1">
+
+            {error && <p className="text-orange text-sm font-bold text-center">{error}</p>}
+
+            <div className="flex gap-4 justify-center">
+              <button onClick={() => setStep(1)} className="btn-secondary text-sm">EDITAR DATOS</button>
+              <button onClick={handleSubmit} disabled={submitting}
+                      className="btn-primary text-sm">
                 {submitting ? 'PROCESANDO...' : 'CONFIRMAR PEDIDO'}
               </button>
             </div>
           </div>
         )}
 
-        {step === 4 && resultado && (
-          <div className="text-center space-y-6 animate-scale-in">
-            <div className="w-16 h-16 rounded-full border-2 border-purple flex items-center justify-center mx-auto text-purple">
-              <CheckIcon />
+        {/* Step 3: Result */}
+        {step === 3 && resultado && (
+          <div className="max-w-xl mx-auto animate-scale-in space-y-8">
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-cyan/10 flex items-center justify-center mx-auto border border-cyan/20 shadow-lg shadow-cyan/10">
+                <CheckIcon />
+              </div>
+              <h2 className="font-display font-extrabold text-2xl text-cyan tracking-[-0.02em]">PEDIDO CONFIRMADO</h2>
+              <p className="text-[#525252] text-sm font-body">Numero de pedido: <span className="font-mono font-bold text-[#fafafa]">#{resultado.id?.slice(0, 8).toUpperCase()}</span></p>
             </div>
-            <h1 className="font-display font-extrabold text-3xl">PEDIDO CONFIRMADO</h1>
-            <p className="text-[#525252] text-base font-body">Pedido #{resultado.id?.slice(0, 8)}</p>
-            {form.metodo_pago === 'TRANSFERENCIA' && (
-              <div className="glass-card p-6 max-w-md mx-auto space-y-3">
-                <p className="font-bold text-orange uppercase tracking-wider text-xs">IMPORTANTE: Tienes 2 horas para transferir</p>
-                <p className="text-[#525252] text-sm font-body">Datos para transferencia:</p>
-                <p className="font-bold text-lg">Banco: ___</p>
-                <p className="font-bold text-lg">Titular: ___</p>
-                <p className="font-bold text-lg">RUT: ___</p>
-                <p className="font-bold text-lg">Cta. Corriente: ___</p>
-                <p className="font-bold text-purple">Alias: FLOW.GANGSTER</p>
-                <p className="font-bold">Monto: ${resultado.total?.toLocaleString('es-CL')}</p>
+
+            <div className="liquid-card p-8 space-y-4">
+              <h3 className="font-bold text-sm tracking-[0.15em] uppercase text-[#525252]">Resumen</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-[#525252]">Subtotal</span>
+                  <span className="text-[#fafafa]">${resultado.subtotal?.toLocaleString('es-CL')}</span>
+                </div>
+                {resultado.descuento > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-[#525252]">Descuento</span>
+                    <span className="text-cyan">-${resultado.descuento?.toLocaleString('es-CL')}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-bold text-base pt-2 border-t border-white/[0.04]">
+                  <span>TOTAL</span>
+                  <span className="text-cyan">${resultado.total?.toLocaleString('es-CL')}</span>
+                </div>
+              </div>
+            </div>
+
+            {resultado.whatsapp_url && (
+              <div className="text-center">
+                <a href={resultado.whatsapp_url} target="_blank" rel="noopener noreferrer"
+                   className="btn-primary text-sm inline-flex items-center gap-2">
+                  ENVIAR COMPROBANTE
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                </a>
+                <p className="text-[#525252] text-xs mt-4 font-body">Te redirigiremos a WhatsApp. Envia el comprobante para confirmar tu pedido.</p>
+                <Link to="/" className="btn-secondary text-sm mt-6 inline-block">VOLVER A TIENDA</Link>
               </div>
             )}
-            <a href={resultado.whatsapp_url} target="_blank" rel="noreferrer"
-               className="btn-primary inline-block text-sm">
-              ENVIAR COMPROBANTE POR WHATSAPP
-            </a>
-            <p className="text-[#525252] text-xs font-body">
-              Tu par queda reservado. Si no transfieres dentro del plazo, el stock se libera automaticamente.
-            </p>
-            <Link to="/" className="btn-secondary inline-block text-sm">SEGUIR COMPRANDO</Link>
           </div>
         )}
       </div>

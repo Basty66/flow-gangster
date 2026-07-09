@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
+import { useAuth } from '../../context/AuthContext';
 
 const ESTADOS = ['PENDIENTE_PAGO', 'PAGADO', 'ENVIADO', 'CANCELADO'];
 
@@ -14,6 +15,7 @@ const TruckIcon = () => (
 );
 
 export default function Dashboard() {
+  const { getAuthHeaders } = useAuth();
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState('PENDIENTE_PAGO');
@@ -24,9 +26,9 @@ export default function Dashboard() {
     setLoading(true);
     try {
       const url = estado ? `/api/admin/pedidos?estado=${estado}` : '/api/admin/pedidos';
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: { ...getAuthHeaders() } });
       const data = await res.json();
-      setPedidos(data);
+      if (res.ok) setPedidos(data);
     } catch (e) { console.error(e); }
     setLoading(false);
   };
@@ -38,7 +40,7 @@ export default function Dashboard() {
       const body = { id, estado_pedido: nuevoEstado };
       if (codigo) body.codigo_seguimiento = codigo;
       const res = await fetch('/api/admin/pedidos', {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+        method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, body: JSON.stringify(body),
       });
       if (res.ok) { setTrackingModal(null); setCodigoTracking(''); fetchPedidos(filtro); }
     } catch (e) { console.error(e); }
@@ -69,7 +71,7 @@ export default function Dashboard() {
       ) : (
         <div className="space-y-3">
           {pedidos.map((p) => (
-            <div key={p.id} className="glass-card p-4">
+            <div key={p.id} className="liquid-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-3">
@@ -120,7 +122,7 @@ export default function Dashboard() {
       {trackingModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in"
              onClick={() => setTrackingModal(null)}>
-          <div className="glass-card p-6 w-full max-w-md space-y-4 animate-scale-in"
+          <div className="liquid-card p-6 w-full max-w-md space-y-4 animate-scale-in"
                onClick={(e) => e.stopPropagation()}>
             <h2 className="font-bold text-base">INGRESAR CODIGO STARKEN</h2>
             <input value={codigoTracking} onChange={(e) => setCodigoTracking(e.target.value)}

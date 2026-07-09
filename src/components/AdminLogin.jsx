@@ -17,7 +17,8 @@ const CloseIcon = () => (
 export default function AdminLogin({ onClose }) {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [pass, setPass] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -25,8 +26,7 @@ export default function AdminLogin({ onClose }) {
     e.preventDefault();
     setError('');
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 300));
-    const res = login(pass);
+    const res = await login(username, password);
     if (res.ok) {
       onClose();
       navigate('/admin');
@@ -53,17 +53,24 @@ export default function AdminLogin({ onClose }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            value={pass}
-            onChange={(e) => setPass(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            type="text"
+            placeholder="Usuario"
+            className="input-field text-center"
+            autoFocus
+          />
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             type="password"
             placeholder="Contraseña"
             className="input-field text-center tracking-widest"
-            autoFocus
           />
           {error && (
             <p className="text-orange text-xs font-bold text-center">{error}</p>
           )}
-          <button type="submit" disabled={loading || !pass}
+          <button type="submit" disabled={loading || !username || !password}
                   className="btn-primary w-full text-center">
             {loading ? '...' : 'INGRESAR'}
           </button>
