@@ -11,13 +11,6 @@ import Seguimiento from './views/Client/Seguimiento';
 import Dashboard from './views/Admin/Dashboard';
 import Inventory from './views/Admin/Inventory';
 import Coupons from './views/Admin/Coupons';
-import { useAuth } from './context/AuthContext';
-
-function ProtectedRoute({ children }) {
-  const { isAdmin } = useAuth();
-  if (!isAdmin) return null;
-  return children;
-}
 
 export default function App() {
   const location = useLocation();
@@ -44,9 +37,9 @@ export default function App() {
             <Route path="/producto/:id" element={<ProductDetail />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/seguimiento" element={<Seguimiento />} />
-            <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/admin/inventario" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
-            <Route path="/admin/cupones" element={<ProtectedRoute><Coupons /></ProtectedRoute>} />
+            <Route path="/admin" element={<Dashboard />} />
+            <Route path="/admin/inventario" element={<Inventory />} />
+            <Route path="/admin/cupones" element={<Coupons />} />
           </Routes>
         </div>
       </main>
