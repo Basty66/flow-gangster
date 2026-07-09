@@ -105,7 +105,7 @@ export default function ProductDetail() {
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-          <div className="card overflow-hidden">
+          <div className="card overflow-hidden group cursor-crosshair">
             {imgError ? (
               <div className="aspect-[4/5] flex items-center justify-center">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1">
@@ -114,7 +114,7 @@ export default function ProductDetail() {
               </div>
             ) : (
               <img src={producto.imagen_url} alt={producto.nombre}
-                   className="w-full aspect-[4/5] object-cover"
+                   className="w-full aspect-[4/5] object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                    onError={() => setImgError(true)} />
             )}
           </div>

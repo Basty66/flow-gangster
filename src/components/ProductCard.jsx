@@ -17,8 +17,10 @@ export default function ProductCard({ producto, index = 0 }) {
 
   return (
     <Link to={`/producto/${producto.id}`}
-          className="card-hover block group animate-fade-up"
-          style={{ animationDelay: `${index * 0.05}s`, opacity: 0 }}>
+          className="card-hover block group"
+          style={{
+            animation: `fade-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.03}s both`,
+          }}>
       <div className="relative aspect-[4/5] overflow-hidden rounded-t-[7px]">
         {imgError ? (
           <div className="w-full h-full flex items-center justify-center bg-surface2">
@@ -30,11 +32,15 @@ export default function ProductCard({ producto, index = 0 }) {
           <img
             src={producto.imagen_url}
             alt={producto.nombre}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             onError={() => setImgError(true)}
             loading="lazy"
           />
         )}
+
+        {/* Shimmer overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/40 via-transparent to-transparent
+                      opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {producto.modalidad === 'STOCK' ? (
@@ -65,7 +71,9 @@ export default function ProductCard({ producto, index = 0 }) {
 
       <div className="p-4 space-y-2">
         <p className="text-[#666] text-[9px] font-medium uppercase tracking-[0.12em]">{producto.marca}</p>
-        <h3 className="font-display font-bold text-sm text-[#f5f5f5]">{producto.nombre}</h3>
+        <h3 className="font-display font-bold text-sm text-[#f5f5f5] group-hover:text-purple transition-colors duration-200">
+          {producto.nombre}
+        </h3>
 
         <div className="flex items-center justify-between pt-2 border-t border-[#2a2a2a]">
           <p className="font-display font-black text-base text-[#f5f5f5]">

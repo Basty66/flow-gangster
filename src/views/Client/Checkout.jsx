@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import ScrollReveal from '../../components/ScrollReveal';
 
 const steps = [
   { n: 1, label: 'Datos' },

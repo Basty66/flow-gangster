@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import QuickCart from './components/QuickCart';
 import AdminLogin from './components/AdminLogin';
-import StarsBackground from './components/StarsBackground';
+import PageTransition from './components/PageTransition';
 import Home from './views/Client/Home';
 import ProductDetail from './views/Client/ProductDetail';
 import Checkout from './views/Client/Checkout';
@@ -29,12 +29,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-deep flex flex-col relative">
-      <StarsBackground />
+    <div className="min-h-screen bg-deep flex flex-col">
       <Navbar onLogoClick={handleLogoClick} />
-      <main className="flex-1 relative z-10">
-        <div key={location.pathname} className="animate-fade-in">
-          <Routes>
+      <main className="flex-1">
+        <PageTransition key={location.pathname}>
+          <Routes location={location}>
             <Route path="/" element={<Home onLogoClick={handleLogoClick} />} />
             <Route path="/producto/:id" element={<ProductDetail />} />
             <Route path="/checkout" element={<Checkout />} />
@@ -43,7 +42,7 @@ export default function App() {
             <Route path="/admin/inventario" element={<Inventory />} />
             <Route path="/admin/cupones" element={<Coupons />} />
           </Routes>
-        </div>
+        </PageTransition>
       </main>
       <Footer />
       <QuickCart />
