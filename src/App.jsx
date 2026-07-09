@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import QuickCart from './components/QuickCart';
 import AdminLogin from './components/AdminLogin';
+import StarsBackground from './components/StarsBackground';
 import Home from './views/Client/Home';
 import ProductDetail from './views/Client/ProductDetail';
 import Checkout from './views/Client/Checkout';
@@ -28,9 +29,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-deep flex flex-col">
+    <div className="min-h-screen bg-deep flex flex-col relative">
+      <StarsBackground />
       <Navbar onLogoClick={handleLogoClick} />
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         <div key={location.pathname} className="animate-fade-in">
           <Routes>
             <Route path="/" element={<Home onLogoClick={handleLogoClick} />} />
