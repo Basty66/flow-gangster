@@ -1,57 +1,58 @@
 import { useState, useRef } from 'react';
 
-const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+const MAX_SIZE = 2 * 1024 * 1024; // 2MB
 
 export default function ImageUploader({ onUpload, currentUrl }) {
-  const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(currentUrl || '');
   const [dragOver, setDragOver] = useState(false);
+  const [error, setError] = useState('');
+  const [processing, setProcessing] = useState(false);
   const inputRef = useRef(null);
-
-  const uploadToCloudinary = async (file) => {
-    if (!CLOUD_NAME || !UPLOAD_PRESET) {
-      alert('Configura VITE_CLOUDINARY_CLOUD_NAME y VITE_CLOUDINARY_UPLOAD_PRESET en .env');
-      return;
-    }
-
-    setUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', UPLOAD_PRESET);
-
-    try {
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        { method: 'POST', body: formData }
-      );
-      const data = await res.json();
-      if (data.secure_url) {
-        setPreview(data.secure_url);
-        onUpload(data.secure_url);
-      } else {
-        alert('Error al subir: ' + (data.error?.message || 'desconocido'));
-      }
-    } catch (e) {
-      alert('Error de conexión al subir imagen');
-    }
-    setUploading(false);
-  };
 
   const handleFile = (e) => {
     const file = e.target.files?.[0] || e.dataTransfer?.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) return alert('Solo imágenes');
+
+    if (!file.type.startsWith('image/')) {
+      setError('Solo se permiten imágenes');
+      return;
+    }
+
+    if (file.size > MAX_SIZE) {
+      setError('La imagen es muy pesada (máx 2MB)');
+      return;
+    }
+
+    setError('');
+    setProcessing(true);
+
     const reader = new FileReader();
-    reader.onload = (ev) => setPreview(ev.target.result);
+    reader.onload = (ev) => {
+      const base64 = ev.target.result;
+      setPreview(base64);
+      onUpload(base64);
+      setProcessing(false);
+    };
+    reader.onerror = () => {
+      setError('Error al leer la imagen');
+      setProcessing(false);
+    };
     reader.readAsDataURL(file);
-    uploadToCloudinary(file);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
     handleFile({ target: { files: e.dataTransfer.files } });
+  };
+
+  const handleClick = () => inputRef.current?.click();
+
+  const handleRemove = (e) => {
+    e.stopPropagation();
+    setPreview('');
+    onUpload('');
+    inputRef.current.value = '';
   };
 
   return (
@@ -62,7 +63,7 @@ export default function ImageUploader({ onUpload, currentUrl }) {
         onDrop={handleDrop}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
-        onClick={() => inputRef.current?.click()}
+        onClick={preview ? undefined : handleClick}
         className={`relative border-2 border-dashed cursor-pointer transition-all duration-300 overflow-hidden
           ${dragOver ? 'border-neon-cyan bg-neon-cyan/5' : 'border-white/10 hover:border-white/30'}
           ${preview ? 'h-64' : 'h-48'}`}
@@ -72,9 +73,18 @@ export default function ImageUploader({ onUpload, currentUrl }) {
         {preview ? (
           <>
             <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-300
-                          flex items-center justify-center">
-              <span className="font-black text-xs tracking-[0.15em] text-white">CAMBIAR IMAGEN</span>
+            <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition-opacity duration-300
+                          flex items-center justify-center gap-3">
+              <button type="button" onClick={handleClick}
+                      className="font-black text-xs tracking-[0.15em] text-white border-2 border-white px-4 py-2
+                               hover:bg-white hover:text-[#0a0118] transition-all">
+                CAMBIAR
+              </button>
+              <button type="button" onClick={handleRemove}
+                      className="font-black text-xs tracking-[0.15em] text-fire-orange border-2 border-fire-orange px-4 py-2
+                               hover:bg-fire-orange hover:text-white transition-all">
+                ELIMINAR
+              </button>
             </div>
           </>
         ) : (
@@ -84,21 +94,23 @@ export default function ImageUploader({ onUpload, currentUrl }) {
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <p className="text-xs font-bold">Click o arrastra una imagen</p>
+            <p className="text-[9px] text-white/20">Máx 2MB · JPG / PNG</p>
           </div>
         )}
 
-        {uploading && (
+        {processing && (
           <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10">
             <div className="text-center">
-              <div className="w-10 h-10 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-              <p className="font-black text-xs text-neon-cyan tracking-widest">SUBIR...</p>
+              <div className="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="font-black text-xs text-neon-cyan tracking-widest">PROCESANDO...</p>
             </div>
           </div>
         )}
       </div>
 
-      {preview && currentUrl && preview !== currentUrl && (
-        <p className="text-neon-cyan text-xs mt-1 font-bold">✓ Imagen cargada</p>
+      {error && <p className="text-fire-orange text-xs mt-1 font-bold">{error}</p>}
+      {preview && !error && (
+        <p className="text-neon-cyan text-xs mt-1 font-bold tracking-wider">✓ IMAGEN LISTA</p>
       )}
     </div>
   );
