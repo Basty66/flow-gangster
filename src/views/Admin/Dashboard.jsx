@@ -71,7 +71,7 @@ export default function Dashboard() {
       ) : (
         <div className="space-y-3">
           {pedidos.map((p) => (
-            <div key={p.id} className="liquid-card p-4">
+            <div key={p.id} className="glass-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-3">
@@ -122,7 +122,7 @@ export default function Dashboard() {
       {trackingModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in"
              onClick={() => setTrackingModal(null)}>
-          <div className="liquid-card p-6 w-full max-w-md space-y-4 animate-scale-in"
+          <div className="glass-card p-6 w-full max-w-md space-y-4 animate-scale-in"
                onClick={(e) => e.stopPropagation()}>
             <h2 className="font-bold text-base">INGRESAR CODIGO STARKEN</h2>
             <input value={codigoTracking} onChange={(e) => setCodigoTracking(e.target.value)}

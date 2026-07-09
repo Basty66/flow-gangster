@@ -67,7 +67,7 @@ export default function Seguimiento() {
 
         {error && (
           <div className="text-center animate-fade-in">
-            <div className="liquid-card p-8 max-w-md mx-auto border-red-400/10">
+            <div className="glass-card p-8 max-w-md mx-auto border-red-400/10">
               <p className="text-orange font-bold text-sm">{error}</p>
               <p className="text-[#525252] text-xs mt-2 font-body">Verifica el numero e intenta nuevamente</p>
             </div>
@@ -76,7 +76,7 @@ export default function Seguimiento() {
 
         {resultado && (
           <div className="animate-fade-up space-y-6">
-            <div className="liquid-card p-8">
+            <div className="glass-card p-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <p className="text-[#525252] text-xs font-body">Numero de Pedido</p>
@@ -100,7 +100,7 @@ export default function Seguimiento() {
               </div>
             </div>
 
-            <div className="liquid-card p-8 space-y-4">
+            <div className="glass-card p-8 space-y-4">
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <p className="text-[#525252] text-xs font-body">Cliente</p>
@@ -122,7 +122,7 @@ export default function Seguimiento() {
             </div>
 
             {resultado.seguimiento_url && (
-              <div className="liquid-card p-8 text-center border-cyan/10">
+              <div className="glass-card p-8 text-center border-cyan/10">
                 <p className="font-bold text-xs uppercase tracking-[0.15em] text-cyan mb-4">Seguimiento Starken</p>
                 <a href={resultado.seguimiento_url} target="_blank" rel="noopener noreferrer"
                    className="btn-primary text-sm inline-flex items-center gap-2">

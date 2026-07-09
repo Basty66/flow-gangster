@@ -55,7 +55,7 @@ export default function AdminLogin({ onClose }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in"
          onClick={onClose}>
-      <div className="liquid-card w-full max-w-sm animate-scale-in overflow-hidden"
+      <div className="glass-card w-full max-w-sm animate-scale-in overflow-hidden"
            onClick={(e) => e.stopPropagation()}
            style={{ animationDuration: '0.4s' }}>
         {/* Decorative top bar */}

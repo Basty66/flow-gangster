@@ -93,7 +93,7 @@ export default function QuickCart() {
               </div>
             ) : (
               items.map((item, idx) => (
-                <div key={idx} className="liquid-card p-3 flex gap-3 animate-fade-in" style={{ animationDelay: `${idx * 0.05}s` }}>
+                <div key={idx} className="glass-card p-3 flex gap-3 animate-fade-in" style={{ animationDelay: `${idx * 0.05}s` }}>
                   <img src={item.producto.imagen_url} alt={item.producto.nombre}
                        className="w-20 h-20 object-cover border border-white/5 flex-shrink-0"
                        onError={(e) => { e.target.style.display = 'none'; }} />

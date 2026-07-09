@@ -27,13 +27,40 @@ export default function Checkout() {
     comuna: '',
     direccion: '',
     metodo_pago: 'TRANSFERENCIA',
-    cupon: '',
   });
+  const [cupon, setCupon] = useState('');
+  const [descuento, setDescuento] = useState(0);
+  const [cuponMsg, setCuponMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [error, setError] = useState('');
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
+
+  const validarCupon = async () => {
+    if (!cupon) return;
+    setCuponMsg('Validando...');
+    try {
+      const res = await fetch('/api/validar-cupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo: cupon, total_actual: totalPrecio }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDescuento(data.descuento);
+        setCuponMsg(`${data.valor}${data.tipo === 'PERCENT' ? '%' : '$'} off aplicado`);
+      } else {
+        setDescuento(0);
+        setCuponMsg(data.error);
+      }
+    } catch {
+      setDescuento(0);
+      setCuponMsg('Error al validar');
+    }
+  };
+
+  const total = Math.max(0, totalPrecio - descuento);
 
   const handleSubmit = async () => {
     if (!form.nombre || !form.whatsapp) {
@@ -54,7 +81,7 @@ export default function Checkout() {
         tipo_entrega: form.tipo_entrega,
         datos_envio: form.tipo_entrega === 'ENVIO_STARKEN' ? { region: form.region, comuna: form.comuna, direccion: form.direccion } : null,
         metodo_pago: form.metodo_pago,
-        cupon_codigo: form.cupon || undefined,
+        cupon_codigo: cupon || undefined,
       };
       const res = await fetch('/api/pedidos', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
@@ -81,6 +108,7 @@ export default function Checkout() {
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
           </div>
           <p className="font-bold text-lg text-[#525252]">Tu carrito esta vacio</p>
+          <p className="text-[#525252] text-sm font-body">Agrega productos desde la tienda para iniciar tu compra</p>
           <Link to="/" className="btn-primary text-sm">IR A TIENDA</Link>
         </div>
       </div>
@@ -116,9 +144,8 @@ export default function Checkout() {
         {/* Step 1: Form */}
         {step === 1 && (
           <div className="max-w-xl mx-auto animate-fade-up space-y-8">
-            <div className="liquid-card p-8 space-y-5">
+            <div className="glass-card p-8 space-y-5">
               <h2 className="font-display font-bold text-lg tracking-[-0.02em] text-[#fafafa]">Tus Datos</h2>
-
               <div className="space-y-4">
                 <input value={form.nombre} onChange={(e) => update('nombre', e.target.value)}
                        placeholder="Nombre completo *" className="input-field" />
@@ -127,14 +154,13 @@ export default function Checkout() {
               </div>
             </div>
 
-            <div className="liquid-card p-8 space-y-5">
+            <div className="glass-card p-8 space-y-5">
               <h2 className="font-display font-bold text-lg tracking-[-0.02em] text-[#fafafa]">Entrega</h2>
-
               <div className="flex gap-3">
                 <button onClick={() => update('tipo_entrega', 'RETIRAR_SHOWROOM')}
                         className={`flex-1 py-4 rounded-xl border font-bold text-xs uppercase tracking-wider transition-all ${
                           form.tipo_entrega === 'RETIRAR_SHOWROOM'
-                            ? 'border-purple text-purple bg-purple/5 shadow-lg shadow-purple/10'
+                            ? 'border-purple text-purple bg-purple/5'
                             : 'border-white/[0.06] text-[#525252] hover:border-white/20'
                         }`}>
                   RETIRO SHOWROOM
@@ -142,15 +168,14 @@ export default function Checkout() {
                 <button onClick={() => update('tipo_entrega', 'ENVIO_STARKEN')}
                         className={`flex-1 py-4 rounded-xl border font-bold text-xs uppercase tracking-wider transition-all ${
                           form.tipo_entrega === 'ENVIO_STARKEN'
-                            ? 'border-purple text-purple bg-purple/5 shadow-lg shadow-purple/10'
+                            ? 'border-purple text-purple bg-purple/5'
                             : 'border-white/[0.06] text-[#525252] hover:border-white/20'
                         }`}>
                   ENVIO STARKEN
                 </button>
               </div>
-
               {form.tipo_entrega === 'ENVIO_STARKEN' && (
-                <div className="space-y-4 animate-fade-in">
+                <div className="space-y-4">
                   <input value={form.region} onChange={(e) => update('region', e.target.value)}
                          placeholder="Region" className="input-field" />
                   <input value={form.comuna} onChange={(e) => update('comuna', e.target.value)}
@@ -161,14 +186,13 @@ export default function Checkout() {
               )}
             </div>
 
-            <div className="liquid-card p-8 space-y-5">
+            <div className="glass-card p-8 space-y-5">
               <h2 className="font-display font-bold text-lg tracking-[-0.02em] text-[#fafafa]">Pago</h2>
-
               <div className="flex gap-3">
                 <button onClick={() => update('metodo_pago', 'TRANSFERENCIA')}
                         className={`flex-1 py-4 rounded-xl border font-bold text-xs uppercase tracking-wider transition-all ${
                           form.metodo_pago === 'TRANSFERENCIA'
-                            ? 'border-purple text-purple bg-purple/5 shadow-lg shadow-purple/10'
+                            ? 'border-purple text-purple bg-purple/5'
                             : 'border-white/[0.06] text-[#525252] hover:border-white/20'
                         }`}>
                   TRANSFERENCIA
@@ -176,21 +200,21 @@ export default function Checkout() {
                 <button onClick={() => update('metodo_pago', 'EFECTIVO')}
                         className={`flex-1 py-4 rounded-xl border font-bold text-xs uppercase tracking-wider transition-all ${
                           form.metodo_pago === 'EFECTIVO'
-                            ? 'border-purple text-purple bg-purple/5 shadow-lg shadow-purple/10'
+                            ? 'border-purple text-purple bg-purple/5'
                             : 'border-white/[0.06] text-[#525252] hover:border-white/20'
                         }`}>
                   EFECTIVO
                 </button>
               </div>
-
               {form.metodo_pago === 'TRANSFERENCIA' && (
-                <div className="bg-white/[0.02] rounded-xl p-5 space-y-2 border border-white/[0.04] animate-fade-in">
+                <div className="bg-white/[0.02] rounded-xl p-5 space-y-2 border border-white/[0.04]">
                   <p className="font-bold text-xs uppercase tracking-[0.15em] text-cyan">Datos Bancarios</p>
-                  <div className="font-mono text-sm text-[#525252] space-y-1">
-                    <p>Banco: Flow Gangster Bank</p>
-                    <p>Tipo: Cuenta Corriente</p>
-                    <p>Alias: FLOW.GANGSTER</p>
-                    <p>RUT: 00.000.000-0</p>
+                  <div className="font-mono text-sm text-[#a3a3a3] space-y-1">
+                    <p>Banco: <span className="text-[#fafafa]">Mercado Pago</span></p>
+                    <p>Tipo: <span className="text-[#fafafa]">Cuenta Corriente</span></p>
+                    <p>Alias: <span className="text-[#fafafa]">FLOW.GANGSTER</span></p>
+                    <p>RUT: <span className="text-[#fafafa]">77.123.456-7</span></p>
+                    <p>Titular: <span className="text-[#fafafa]">Flow Gangster SpA</span></p>
                   </div>
                   <p className="text-[10px] text-[#525252] mt-2 font-body">Envia el comprobante por WhatsApp para confirmar tu pedido.</p>
                 </div>
@@ -211,9 +235,8 @@ export default function Checkout() {
         {/* Step 2: Summary */}
         {step === 2 && (
           <div className="max-w-xl mx-auto animate-fade-up space-y-8">
-            <div className="liquid-card p-8 space-y-4">
+            <div className="glass-card p-8 space-y-4">
               <h2 className="font-display font-bold text-lg tracking-[-0.02em] text-[#fafafa]">Resumen del Pedido</h2>
-
               <div className="space-y-3">
                 {items.map((item, idx) => (
                   <div key={idx} className="flex items-center gap-4 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
@@ -228,16 +251,35 @@ export default function Checkout() {
                   </div>
                 ))}
               </div>
+            </div>
 
-              <div className="border-t border-white/[0.04] pt-4 space-y-2">
+            <div className="glass-card p-8 space-y-4">
+              <h2 className="font-display font-bold text-lg tracking-[-0.02em] text-[#fafafa]">Cupon de Descuento</h2>
+              <div className="flex gap-2">
+                <input value={cupon} onChange={(e) => setCupon(e.target.value.toUpperCase())}
+                       placeholder="CODIGO CUPON" className="input-field flex-1 text-xs" />
+                <button onClick={validarCupon}
+                        className="btn-secondary text-[10px] px-4 py-2 whitespace-nowrap">APLICAR</button>
+              </div>
+              {cuponMsg && (
+                <p className={`text-xs font-bold ${descuento > 0 ? 'text-cyan' : 'text-orange'}`}>{cuponMsg}</p>
+              )}
+            </div>
+
+            <div className="glass-card p-8 space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-[#525252]">Subtotal</span>
+                <span className="text-[#fafafa] font-bold">${totalPrecio.toLocaleString('es-CL')}</span>
+              </div>
+              {descuento > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#525252]">Subtotal</span>
-                  <span className="text-[#fafafa] font-bold">${totalPrecio.toLocaleString('es-CL')}</span>
+                  <span className="text-[#525252]">Descuento</span>
+                  <span className="text-cyan font-bold">-${descuento.toLocaleString('es-CL')}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold pt-2 border-t border-white/[0.04]">
-                  <span>TOTAL</span>
-                  <span className="text-cyan">${totalPrecio.toLocaleString('es-CL')}</span>
-                </div>
+              )}
+              <div className="flex justify-between text-lg font-bold pt-3 border-t border-white/[0.04]">
+                <span>TOTAL</span>
+                <span className="text-cyan">${total.toLocaleString('es-CL')}</span>
               </div>
             </div>
 
@@ -257,14 +299,14 @@ export default function Checkout() {
         {step === 3 && resultado && (
           <div className="max-w-xl mx-auto animate-scale-in space-y-8">
             <div className="text-center space-y-4">
-              <div className="w-20 h-20 rounded-full bg-cyan/10 flex items-center justify-center mx-auto border border-cyan/20 shadow-lg shadow-cyan/10">
+              <div className="w-20 h-20 rounded-full bg-cyan/10 flex items-center justify-center mx-auto border border-cyan/20">
                 <CheckIcon />
               </div>
               <h2 className="font-display font-extrabold text-2xl text-cyan tracking-[-0.02em]">PEDIDO CONFIRMADO</h2>
               <p className="text-[#525252] text-sm font-body">Numero de pedido: <span className="font-mono font-bold text-[#fafafa]">#{resultado.id?.slice(0, 8).toUpperCase()}</span></p>
             </div>
 
-            <div className="liquid-card p-8 space-y-4">
+            <div className="glass-card p-8 space-y-4">
               <h3 className="font-bold text-sm tracking-[0.15em] uppercase text-[#525252]">Resumen</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">

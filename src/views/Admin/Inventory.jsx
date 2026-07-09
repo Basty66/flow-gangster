@@ -73,7 +73,7 @@ export default function Inventory() {
       </button>
 
       {showForm && (
-        <form onSubmit={createProducto} className="liquid-card p-8 mb-10 space-y-6 animate-fade-in">
+        <form onSubmit={createProducto} className="glass-card p-8 mb-10 space-y-6 animate-fade-in">
           <h2 className="font-display font-bold text-lg tracking-[-0.02em]">Nuevo Producto</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
@@ -132,7 +132,7 @@ export default function Inventory() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {productos.map((p) => (
-            <div key={p.id} className="liquid-card overflow-hidden group transition-all duration-300">
+            <div key={p.id} className="glass-card overflow-hidden group transition-all duration-300">
               <div className="flex">
                 <div className="w-28 h-28 flex-shrink-0 overflow-hidden bg-surface">
                   <img src={p.imagen_url} alt={p.nombre}

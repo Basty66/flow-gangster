@@ -8,39 +8,40 @@ export default function ProductCard({ producto, index = 0 }) {
     ? producto.talles?.filter((t) => t.talle) || []
     : producto.talles?.filter((t) => parseInt(t.cantidad) > 0) || [];
 
-  const isLowStock = producto.modalidad === 'STOCK' &&
-    tallesDisponibles.reduce((s, t) => s + parseInt(t.cantidad), 0) <= 5;
+  const sinStock = producto.modalidad === 'STOCK' && tallesDisponibles.length === 0;
+
+  const totalStock = producto.modalidad === 'STOCK'
+    ? tallesDisponibles.reduce((s, t) => s + parseInt(t.cantidad), 0)
+    : 0;
+
+  const isLowStock = producto.modalidad === 'STOCK' && totalStock > 0 && totalStock <= 5;
 
   return (
     <Link to={`/producto/${producto.id}`}
-          className="liquid-card-hover block group animate-slide-up"
+          className="glass-card-hover block group animate-slide-up"
           style={{ animationDelay: `${index * 0.08}s`, opacity: 0 }}>
-      <div className="relative aspect-square overflow-hidden rounded-2xl">
+      <div className="relative aspect-square overflow-hidden rounded-t-xl">
         {imgError ? (
-          <div className="w-full h-full flex items-center justify-center bg-surface2">
+          <div className="w-full h-full flex items-center justify-center bg-white/[0.02]">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#525252" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="9" r="4"/><path d="M4 20h16"/><path d="M9 16l-5-5 5-5"/><path d="M15 16l5-5-5-5"/>
             </svg>
           </div>
         ) : (
-          <>
-            <img
-              src={producto.imagen_url}
-              alt={producto.nombre}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-              onError={() => setImgError(true)}
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-surface2/80 via-transparent to-transparent
-                          opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          </>
+          <img
+            src={producto.imagen_url}
+            alt={producto.nombre}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={() => setImgError(true)}
+            loading="lazy"
+          />
         )}
 
         {/* Hover overlay */}
-        <div className="absolute inset-0 flex items-end p-5
-                      opacity-0 group-hover:opacity-100 transition-all duration-500">
-          <span className="font-bold text-xs tracking-wider text-[#fafafa] translate-y-4
-                         group-hover:translate-y-0 transition-transform duration-500
+        <div className="absolute inset-0 bg-gradient-to-t from-deep/60 via-transparent to-transparent
+                      opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
+          <span className="font-bold text-xs tracking-wider text-white translate-y-4
+                         group-hover:translate-y-0 transition-transform duration-300
                          px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
             VER DETALLE
           </span>
@@ -49,18 +50,25 @@ export default function ProductCard({ producto, index = 0 }) {
         {/* Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           {producto.modalidad === 'STOCK' ? (
-            <span className="badge-stock shadow-lg shadow-cyan/5">INSTANT DROP</span>
+            <span className="badge-stock">INSTANT DROP</span>
           ) : (
-            <span className="badge-preorder shadow-lg shadow-purple/5">PRE-ORDER</span>
+            <span className="badge-preorder">PRE-ORDER</span>
           )}
           {isLowStock && (
-            <span className="badge-ultimos">ULTIMOS</span>
+            <span className="text-[10px] font-mono font-medium tracking-[0.15em] uppercase px-3 py-1 rounded-md bg-orange/10 text-orange border border-orange/20">
+              ULTIMOS
+            </span>
+          )}
+          {sinStock && (
+            <span className="text-[10px] font-mono font-medium tracking-[0.15em] uppercase px-3 py-1 rounded-md bg-red-400/10 text-red-400 border border-red-400/20">
+              SIN STOCK
+            </span>
           )}
         </div>
 
         {producto.modalidad === 'ENCARGO' && producto.tiempo_espera_dias > 0 && (
           <div className="absolute bottom-4 right-4">
-            <span className="bg-gradient-to-r from-orange/10 to-amber/10 text-orangelight text-[9px] font-bold px-2.5 py-1.5 uppercase tracking-[0.1em] border border-orange/20 rounded-full backdrop-blur-sm">
+            <span className="text-[9px] font-bold px-2.5 py-1.5 uppercase tracking-[0.1em] rounded-full backdrop-blur-sm bg-orange/10 text-orange border border-orange/20">
               ~{producto.tiempo_espera_dias} DIAS
             </span>
           </div>
@@ -70,11 +78,9 @@ export default function ProductCard({ producto, index = 0 }) {
       <div className="p-5 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-[#525252] text-[10px] font-medium uppercase tracking-[0.2em]">{producto.marca}</span>
-          <span className="font-mono text-[10px] text-white/[0.08]">#{producto.id?.slice(0, 4).toUpperCase()}</span>
         </div>
 
-        <h3 className="font-display font-bold text-lg leading-tight text-[#fafafa]
-                      group-hover:text-gradient-purple-cyan transition-all duration-300">
+        <h3 className="font-display font-bold text-lg leading-tight text-[#fafafa]">
           {producto.nombre}
         </h3>
 
@@ -83,13 +89,18 @@ export default function ProductCard({ producto, index = 0 }) {
         </p>
 
         <div className="flex items-center justify-between pt-3 border-t border-white/[0.04]">
-          <p className="font-display font-extrabold text-2xl tracking-tight text-cyan">
+          <p className="font-display font-extrabold text-xl tracking-tight text-cyan">
             ${producto.precio.toLocaleString('es-CL')}
           </p>
-          <span className="font-medium text-[10px] uppercase tracking-[0.1em] text-[#525252] flex items-center gap-1.5 bg-white/[0.03] px-3 py-1.5 rounded-full">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 20h16"/><path d="M9 16l-5-5 5-5"/><path d="M15 16l5-5-5-5"/></svg>
-            {tallesDisponibles.length} TALLES
-          </span>
+          {!sinStock && (
+            <span className="font-medium text-[10px] uppercase tracking-[0.1em] text-[#525252] flex items-center gap-1.5 bg-white/[0.03] px-3 py-1.5 rounded-full">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 20h16"/><path d="M9 16l-5-5 5-5"/><path d="M15 16l5-5-5-5"/></svg>
+              {tallesDisponibles.length} TALLES
+            </span>
+          )}
+          {sinStock && (
+            <span className="font-medium text-[10px] uppercase tracking-[0.1em] text-red-400/60">AGOTADO</span>
+          )}
         </div>
       </div>
     </Link>
