@@ -11,10 +11,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-full border-2 border-neon-cyan/30 flex items-center justify-center
-                       group-hover:border-neon-cyan transition-colors duration-300">
-            <span className="font-display font-black text-neon-cyan text-sm">FG</span>
-          </div>
+          <img src="/logo.svg" alt="Flow Gangster" className="w-10 h-10 group-hover:scale-110 transition-transform duration-300" />
           <div className="hidden sm:block">
             <p className="font-display text-xl font-black tracking-tight
                         bg-gradient-to-r from-neon-cyan to-neon-pink bg-clip-text text-transparent

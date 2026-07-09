@@ -7,9 +7,7 @@ export default function Footer() {
         {/* Brand */}
         <div className="md:col-span-2">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full border-2 border-neon-cyan/30 flex items-center justify-center">
-              <span className="font-display font-black text-neon-cyan text-sm">FG</span>
-            </div>
+            <img src="/logo.svg" alt="Flow Gangster" className="w-10 h-10" />
             <div>
               <p className="font-display text-xl font-black tracking-tight
                           bg-gradient-to-r from-neon-cyan to-neon-pink bg-clip-text text-transparent

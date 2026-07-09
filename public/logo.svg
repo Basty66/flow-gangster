@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shadow -->
+  <ellipse cx="100" cy="175" rx="40" ry="8" fill="rgba(0,0,0,0.3)"/>
+
+  <!-- Tentacles (8 brazos) -->
+  <g stroke="url(#g)" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.85">
+    <path d="M60 110 Q30 130 25 160 Q22 175 18 180"/>
+    <path d="M55 120 Q20 145 15 170 Q12 182 10 185"/>
+    <path d="M65 130 Q45 155 40 175 Q38 185 35 188"/>
+    <path d="M70 135 Q60 160 55 178 Q52 186 50 190"/>
+    <path d="M140 110 Q170 130 175 160 Q178 175 182 180"/>
+    <path d="M145 120 Q180 145 185 170 Q188 182 190 185"/>
+    <path d="M135 130 Q155 155 160 175 Q162 185 165 188"/>
+    <path d="M130 135 Q140 160 145 178 Q148 186 150 190"/>
+  </g>
+
+  <!-- Cuerpo pulpo -->
+  <ellipse cx="100" cy="100" rx="45" ry="50" fill="url(#g)" stroke="#ea580c" stroke-width="3"/>
+
+  <!-- Ojos fruncidos/style gangster -->
+  <g fill="white">
+    <!-- Ojo izquierdo -->
+    <ellipse cx="82" cy="88" rx="9" ry="7"/>
+    <ellipse cx="81" cy="90" rx="4" ry="5" fill="#0a0118"/>
+    <circle cx="80" cy="88" r="1.5" fill="white"/>
+    <!-- Ceño fruncido izq -->
+    <path d="M72 80 Q82 76 92 82" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+    <!-- Ojo derecho -->
+    <ellipse cx="118" cy="88" rx="9" ry="7"/>
+    <ellipse cx="119" cy="90" rx="4" ry="5" fill="#0a0118"/>
+    <circle cx="118" cy="88" r="1.5" fill="white"/>
+    <!-- Ceño fruncido der -->
+    <path d="M108 82 Q118 76 128 80" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Boca / expresión seria -->
+  <path d="M90 108 Q100 112 110 108" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Gorra Jordan - visera -->
+  <path d="M58 78 Q60 60 80 55 Q100 50 120 55 Q140 60 142 78" fill="#ce1141" stroke="white" stroke-width="1.5"/>
+  <!-- Visera -->
+  <path d="M58 78 Q55 80 65 82 Q80 84 100 82 Q120 80 142 78" fill="#ce1141" stroke="white" stroke-width="1.5"/>
+  <!-- Botón gorra -->
+  <circle cx="100" cy="55" r="3" fill="white"/>
+  <!-- Jordan Jumpman simplificado en gorra -->
+  <path d="M95 62 L100 70 L105 62" stroke="white" stroke-width="1.5" fill="none"/>
+  <circle cx="100" cy="60" r="2" fill="white"/>
+
+  <!-- Cadena de oro -->
+  <g stroke="#ffd700" stroke-width="2.5" fill="none" stroke-linecap="round">
+    <path d="M85 120 Q80 130 82 140" />
+    <path d="M115 120 Q120 130 118 140" />
+    <!-- Medalla / inicial -->
+    <circle cx="100" cy="142" r="8" stroke="#ffd700" stroke-width="2" fill="#ffd700" fill-opacity="0.2"/>
+    <text x="100" y="146" font-family="serif" font-weight="900" font-size="10" fill="#ffd700" text-anchor="middle">FG</text>
+  </g>
+
+  <!-- Zapatilla Jordan colgando (tentáculo izq superior) -->
+  <g transform="translate(25, 195) rotate(-20)">
+    <rect x="0" y="0" width="30" height="14" rx="3" fill="white" stroke="#222" stroke-width="1.5"/>
+    <rect x="0" y="0" width="10" height="14" rx="3" fill="#ce1141" stroke="#222" stroke-width="1.5"/>
+    <path d="M10 0 Q15 -4 20 0" fill="#222"/>
+    <circle cx="8" cy="7" r="2" fill="#222"/>
+    <path d="M-2 14 L-5 18 L35 18 L32 14" fill="none" stroke="#222" stroke-width="1.5"/>
+  </g>
+
+  <!-- Zapatilla Jordan colgando (tentáculo der superior) -->
+  <g transform="translate(145, 195) rotate(20) scale(-1,1)">
+    <rect x="0" y="0" width="30" height="14" rx="3" fill="white" stroke="#222" stroke-width="1.5"/>
+    <rect x="0" y="0" width="10" height="14" rx="3" fill="#ce1141" stroke="#222" stroke-width="1.5"/>
+    <path d="M10 0 Q15 -4 20 0" fill="#222"/>
+    <circle cx="8" cy="7" r="2" fill="#222"/>
+    <path d="M-2 14 L-5 18 L35 18 L32 14" fill="none" stroke="#222" stroke-width="1.5"/>
+  </g>
+
+  <!-- Texto FLOW GANGSTER abajo -->
+  <text x="100" y="168" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="10"
+        fill="white" text-anchor="middle" letter-spacing="3" fill-opacity="0.0"/>
+</svg>
