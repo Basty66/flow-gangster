@@ -49,10 +49,10 @@ export default function Home({ onLogoClick }) {
   return (
     <div className="min-h-screen relative">
       {/* Floating logos */}
-      <div className="hidden lg:block fixed pointer-events-none z-0 opacity-[0.03]">
-        <img src="/logo.svg" alt="" className="w-44 h-44 animate-float" style={{ position: 'fixed', top: '15%', left: '3%' }} />
-        <img src="/logo.svg" alt="" className="w-28 h-28 animate-float-reverse" style={{ position: 'fixed', top: '65%', right: '5%' }} />
-        <img src="/logo.svg" alt="" className="w-20 h-20 animate-float" style={{ position: 'fixed', top: '45%', left: '80%', animationDelay: '-8s' }} />
+      <div className="hidden lg:block fixed pointer-events-none z-0 opacity-[0.04]">
+        <img src="/logo-mark.svg" alt="" className="w-36 h-36 animate-float" style={{ position: 'fixed', top: '15%', left: '3%' }} />
+        <img src="/logo-mark.svg" alt="" className="w-24 h-24 animate-float-reverse" style={{ position: 'fixed', top: '65%', right: '5%' }} />
+        <img src="/logo-mark.svg" alt="" className="w-16 h-16 animate-float" style={{ position: 'fixed', top: '45%', left: '80%', animationDelay: '-8s' }} />
       </div>
 
       {/* Hero */}

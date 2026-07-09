@@ -24,7 +24,7 @@ export default function Navbar({ onLogoClick }) {
         <button onClick={onLogoClick} className="flex items-center gap-2.5 group cursor-pointer">
           <div className="relative flex-shrink-0">
             <div className="absolute inset-0 bg-purple/20 blur-md rounded-full group-hover:bg-purple/30 transition-all duration-500" />
-            <img src="/logo.svg" alt="Flow Gangster" className="relative w-8 h-8 transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(139,92,246,0.4)]" />
+            <img src="/logo-mark.svg" alt="Flow Gangster" className="relative w-8 h-8 transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(139,92,246,0.4)]" />
           </div>
           <div className="hidden sm:block">
             <p className="font-display font-extrabold text-sm tracking-[0.15em] leading-tight text-[#fafafa] group-hover:text-gradient-purple-cyan transition-all duration-500">FLOW GANGSTER</p>

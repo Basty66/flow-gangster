@@ -28,7 +28,7 @@ export default function Footer() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <div className="absolute inset-0 bg-purple/20 blur-lg rounded-full" />
-                <img src="/logo.svg" alt="Flow Gangster" className="relative w-10 h-10" />
+                <img src="/logo-mark.svg" alt="Flow Gangster" className="relative w-10 h-10" />
               </div>
               <div>
                 <p className="font-display font-extrabold text-lg tracking-[0.15em] text-[#fafafa]">FLOW GANGSTER</p>

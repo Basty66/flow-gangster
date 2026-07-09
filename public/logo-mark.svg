@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="fgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="fgGrad2" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- FG Monogram Mark -->
+  <g transform="translate(0, 2)">
+    <!-- F -->
+    <rect x="62" y="48" width="10" height="104" rx="2" fill="url(#fgGrad)"/>
+    <rect x="62" y="48" width="56" height="10" rx="2" fill="url(#fgGrad)"/>
+    <rect x="62" y="84" width="42" height="9" rx="1.5" fill="url(#fgGrad2)" opacity="0.85"/>
+
+    <!-- G -->
+    <path d="M138 62 C150 62 152 64 152 78 L152 88 L144 88 L144 80 C144 74 142 70 138 70 L124 70 C118 70 114 74 114 80 L114 120 C114 126 118 130 124 130 L138 130 C142 130 144 126 144 120 L144 114 L132 114 L132 104 L152 104 L152 120 C152 134 148 140 138 140 L124 140 C110 140 104 132 104 120 L104 80 C104 68 110 62 124 62 Z"
+          fill="url(#fgGrad)"/>
+  </g>
+</svg>
