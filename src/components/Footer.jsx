@@ -2,44 +2,37 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/5 mt-20">
+    <footer className="border-t border-white/5 mt-24">
       <div className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
-        {/* Brand */}
         <div className="md:col-span-2">
           <div className="flex items-center gap-3 mb-4">
-            <img src="/logo.svg" alt="Flow Gangster" className="w-10 h-10" />
-            <div>
-              <p className="font-display text-xl font-black tracking-tight
-                          bg-gradient-to-r from-neon-cyan to-neon-pink bg-clip-text text-transparent
-                          leading-none">FLOW GANGSTER</p>
-            </div>
+            <img src="/logo.svg" alt="Flow Gangster" className="w-8 h-8" />
+            <p className="font-display font-extrabold text-base tracking-[0.15em]">FLOW GANGSTER</p>
           </div>
-          <p className="text-white/30 text-sm leading-relaxed max-w-md">
-            Tu tienda de sneakers con estilo urbano. Stock físico y pedidos por encargo
-            con delivery en todo Chile vía Starken.
+          <p className="text-[#525252] text-sm leading-relaxed max-w-md font-body">
+            Tu tienda de sneakers con estilo urbano. Stock fisico y pedidos por encargo
+            con delivery en todo Chile via Starken.
           </p>
         </div>
 
-        {/* Quick links */}
         <div>
-          <h4 className="font-black text-xs tracking-[0.2em] uppercase text-white/40 mb-6">Navegación</h4>
+          <h4 className="font-bold text-xs tracking-[0.15em] uppercase text-[#525252] mb-6">Navegacion</h4>
           <div className="space-y-3">
             {[
               { to: '/', label: 'Tienda' },
               { to: '/seguimiento', label: 'Tracking Starken' },
             ].map((l) => (
               <Link key={l.to} to={l.to}
-                    className="block text-sm text-white/30 hover:text-neon-cyan transition-colors font-body">
+                    className="block text-sm text-[#525252] hover:text-[#fafafa] transition-colors font-body">
                 {l.label}
               </Link>
             ))}
           </div>
         </div>
 
-        {/* Contact */}
         <div>
-          <h4 className="font-black text-xs tracking-[0.2em] uppercase text-white/40 mb-6">Contacto</h4>
-          <div className="space-y-3 text-sm text-white/30 font-body">
+          <h4 className="font-bold text-xs tracking-[0.15em] uppercase text-[#525252] mb-6">Contacto</h4>
+          <div className="space-y-3 text-sm text-[#525252] font-body">
             <p>WhatsApp: +56 9 0000 0000</p>
             <p>Instagram: @flowgangster</p>
             <p>Melipilla, Chile</p>
@@ -47,16 +40,13 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar */}
       <div className="border-t border-white/5 py-6">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-white/20 text-xs font-body">
-            © 2026 Flow Gangster — Todos los derechos reservados
+          <p className="text-[#525252] text-xs font-body">
+            &copy; 2026 Flow Gangster — Todos los derechos reservados
           </p>
-          <div className="flex gap-6 text-[10px] font-black tracking-[0.2em] uppercase text-white/20">
+          <div className="flex gap-4 text-[10px] font-medium tracking-[0.15em] uppercase text-[#525252]">
             <span>React + Vercel + Neon</span>
-            <span>·</span>
-            <span>Hecho en Chile</span>
           </div>
         </div>
       </div>

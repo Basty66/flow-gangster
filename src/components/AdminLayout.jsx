@@ -10,24 +10,22 @@ export default function AdminLayout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen pt-24 pb-16">
+    <div className="min-h-screen pt-20 pb-16">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="font-display text-3xl font-black">
-            <span className="text-neon-pink">[</span> PANEL ADMIN <span className="text-neon-pink">]</span>
-          </h1>
-          <Link to="/" className="text-white/40 text-sm font-black uppercase tracking-wider hover:text-white transition-colors">
-            ← VER TIENDA
+          <h1 className="font-display font-bold text-xl tracking-[0.02em]">Panel Admin</h1>
+          <Link to="/" className="text-[#525252] text-xs font-bold uppercase tracking-[0.15em] hover:text-[#fafafa] transition-colors">
+            Ver Tienda
           </Link>
         </div>
 
-        <nav className="flex gap-1 mb-8 border-b-2 border-white/10">
+        <nav className="flex gap-1 mb-8 border-b border-white/5">
           {links.map((link) => (
             <Link key={link.to} to={link.to}
-                  className={`px-6 py-3 font-black uppercase text-sm tracking-wider transition-all duration-200 border-b-2 -mb-[2px] ${
+                  className={`px-5 py-3 font-bold text-xs uppercase tracking-[0.15em] transition-all duration-200 border-b -mb-[1px] ${
                     location.pathname === link.to
-                      ? 'border-neon-cyan text-neon-cyan'
-                      : 'border-transparent text-white/40 hover:text-white/70'
+                      ? 'border-accent text-accent'
+                      : 'border-transparent text-[#525252] hover:text-[#fafafa]'
                   }`}>
               {link.label}
             </Link>

@@ -27,36 +27,36 @@ export default function Coupons() {
       });
 
       if (res.ok) {
-        setMsg({ type: 'success', text: '✓ Cupón creado exitosamente' });
+        setMsg({ type: 'success', text: 'Cupon creado exitosamente' });
         setForm({ codigo: '', tipo: 'PERCENT', valor: '', fecha_expiracion: '', limite_usos: '' });
       } else {
         const data = await res.json();
-        setMsg({ type: 'error', text: `✕ ${data.error}` });
+        setMsg({ type: 'error', text: data.error });
       }
     } catch {
-      setMsg({ type: 'error', text: 'Error al crear cupón' });
+      setMsg({ type: 'error', text: 'Error al crear cupon' });
     }
   };
 
   return (
     <AdminLayout>
       <div className="max-w-lg">
-        <h2 className="font-black text-lg mb-6 uppercase tracking-wider">Crear Cupón de Descuento</h2>
+        <h2 className="font-bold text-base mb-6 uppercase tracking-[0.15em]">Crear Cupon de Descuento</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input value={form.codigo} onChange={(e) => setForm({ ...form, codigo: e.target.value.toUpperCase() })}
-                 placeholder="Código (Ej: DROP20)" className="input-field uppercase" required />
+                 placeholder="Codigo (Ej: DROP20)" className="input-field uppercase text-xs" required />
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setForm({ ...form, tipo: 'PERCENT' })}
-                    className={`flex-1 py-3 border-2 font-black text-sm uppercase tracking-wider transition-all ${
-                      form.tipo === 'PERCENT' ? 'border-neon-cyan text-neon-cyan' : 'border-white/20 text-white/60'
+                    className={`flex-1 py-3 border font-bold text-xs uppercase tracking-wider transition-all ${
+                      form.tipo === 'PERCENT' ? 'border-accent text-accent' : 'border-white/10 text-[#525252]'
                     }`}>
               Porcentaje %
             </button>
             <button type="button" onClick={() => setForm({ ...form, tipo: 'FIXED' })}
-                    className={`flex-1 py-3 border-2 font-black text-sm uppercase tracking-wider transition-all ${
-                      form.tipo === 'FIXED' ? 'border-neon-cyan text-neon-cyan' : 'border-white/20 text-white/60'
+                    className={`flex-1 py-3 border font-bold text-xs uppercase tracking-wider transition-all ${
+                      form.tipo === 'FIXED' ? 'border-accent text-accent' : 'border-white/10 text-[#525252]'
                     }`}>
               Monto Fijo $
             </button>
@@ -70,16 +70,16 @@ export default function Coupons() {
                  type="date" className="input-field" required />
 
           <input value={form.limite_usos} onChange={(e) => setForm({ ...form, limite_usos: e.target.value })}
-                 type="number" placeholder="Límite de usos" className="input-field" required />
+                 type="number" placeholder="Limite de usos" className="input-field" required />
 
           {msg.text && (
-            <p className={`font-black text-sm ${msg.type === 'success' ? 'text-neon-cyan' : 'text-fire-orange'}`}>
+            <p className={`font-bold text-xs ${msg.type === 'success' ? 'text-accent' : 'text-red-400'}`}>
               {msg.text}
             </p>
           )}
 
           <button type="submit" className="btn-primary w-full">
-            CREAR CUPÓN
+            CREAR CUPON
           </button>
         </form>
       </div>

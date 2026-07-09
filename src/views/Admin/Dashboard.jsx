@@ -3,6 +3,18 @@ import AdminLayout from '../../components/AdminLayout';
 
 const ESTADOS = ['PENDIENTE_PAGO', 'PAGADO', 'ENVIADO', 'CANCELADO'];
 
+const CheckIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+);
+
+const XIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+);
+
+const TruckIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+);
+
 export default function Dashboard() {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,9 +29,7 @@ export default function Dashboard() {
       const res = await fetch(url);
       const data = await res.json();
       setPedidos(data);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
     setLoading(false);
   };
 
@@ -29,7 +39,6 @@ export default function Dashboard() {
     try {
       const body = { id, estado_pedido: nuevoEstado };
       if (codigo) body.codigo_seguimiento = codigo;
-
       const res = await fetch('/api/admin/pedidos', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -40,71 +49,69 @@ export default function Dashboard() {
         setCodigoTracking('');
         fetchPedidos(filtro);
       }
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
   };
 
   const estadoColor = (estado) => {
     const map = {
-      PENDIENTE_PAGO: 'text-yellow-400',
-      PAGADO: 'text-neon-cyan',
-      ENVIADO: 'text-neon-cyan',
-      CANCELADO: 'text-red-500',
+      PENDIENTE_PAGO: 'text-amber',
+      PAGADO: 'text-accent',
+      ENVIADO: 'text-accent',
+      CANCELADO: 'text-red-400',
     };
-    return map[estado] || 'text-white';
+    return map[estado] || 'text-[#525252]';
   };
 
   return (
     <AdminLayout>
-      {/* Filtros */}
       <div className="flex flex-wrap gap-2 mb-8">
         {ESTADOS.map((e) => (
           <button key={e} onClick={() => setFiltro(e)}
-                  className={`admin-btn ${filtro === e ? 'bg-white text-space-black border-white' : 'bg-transparent text-white'}`}>
+                  className={`admin-btn ${filtro === e ? 'bg-[#fafafa] text-black border-[#fafafa]' : ''}`}>
             {e.replace(/_/g, ' ')}
           </button>
         ))}
         <button onClick={() => setFiltro('')}
-                className={`admin-btn ${!filtro ? 'bg-white text-space-black border-white' : 'bg-transparent text-white'}`}>
+                className={`admin-btn ${!filtro ? 'bg-[#fafafa] text-black border-[#fafafa]' : ''}`}>
           TODOS
         </button>
       </div>
 
       {loading ? (
         <div className="text-center py-20">
-          <div className="w-10 h-10 border-4 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-8 h-8 border border-accent border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       ) : pedidos.length === 0 ? (
-        <div className="text-center py-20 text-white/40 font-black text-xl">No hay pedidos en {filtro || 'esta categoría'}</div>
+        <div className="text-center py-20 text-[#525252] font-bold text-base">No hay pedidos en {filtro || 'esta categoria'}</div>
       ) : (
         <div className="space-y-3">
           {pedidos.map((p) => (
-            <div key={p.id} className="card-product p-4">
+            <div key={p.id} className="glass-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-3">
-                    <span className="font-black text-sm">#{p.id?.slice(0, 8)}</span>
-                    <span className={`font-black text-xs uppercase tracking-wider ${estadoColor(p.estado_pedido)}`}>
+                    <span className="font-bold text-sm">#{p.id?.slice(0, 8)}</span>
+                    <span className={`font-bold text-xs uppercase tracking-wider ${estadoColor(p.estado_pedido)}`}>
                       {p.estado_pedido?.replace(/_/g, ' ')}
                     </span>
                   </div>
-                  <p className="font-black">{p.cliente_nombre}</p>
-                  <p className="text-white/60 text-sm">WhatsApp: {p.cliente_whatsapp}</p>
-                  <p className="text-white/60 text-sm">
-                    {p.tipo_entrega === 'ENVIO_STARKEN' ? '📦 Envío Starken' : '🏬 Retiro Showroom'}
-                    {p.metodo_pago === 'TRANSFERENCIA' ? ' | 💳 Transferencia' : ' | 💵 Efectivo'}
+                  <p className="font-bold">{p.cliente_nombre}</p>
+                  <p className="text-[#525252] text-sm font-body">WhatsApp: {p.cliente_whatsapp}</p>
+                  <p className="text-[#525252] text-sm font-body">
+                    {p.tipo_entrega === 'ENVIO_STARKEN' ? 'Envio Starken' : 'Retiro Showroom'}
+                    {' | '}
+                    {p.metodo_pago === 'TRANSFERENCIA' ? 'Transferencia' : 'Efectivo'}
                   </p>
-                  <p className="text-neon-cyan font-black text-lg">${p.total?.toLocaleString('es-CL')}</p>
+                  <p className="text-accent font-bold text-base">${p.total?.toLocaleString('es-CL')}</p>
                   {p.detalle?.length > 0 && (
-                    <div className="text-white/50 text-xs space-y-1">
+                    <div className="text-[#525252] text-xs space-y-0.5 font-body">
                       {p.detalle.map((d, i) => (
-                        <p key={i}>• {d.talle} × {d.cantidad}</p>
+                        <p key={i}>{d.producto_nombre || ''} — Talle {d.talle} x {d.cantidad}</p>
                       ))}
                     </div>
                   )}
                   {p.codigo_seguimiento && (
-                    <p className="text-fire-orange text-xs font-bold">Tracking: {p.codigo_seguimiento}</p>
+                    <p className="text-amber text-xs font-bold">Tracking: {p.codigo_seguimiento}</p>
                   )}
                 </div>
 
@@ -112,19 +119,19 @@ export default function Dashboard() {
                   {p.estado_pedido === 'PENDIENTE_PAGO' && (
                     <>
                       <button onClick={() => updateEstado(p.id, 'PAGADO')}
-                              className="admin-btn bg-neon-cyan/20 text-neon-cyan border-neon-cyan hover:bg-neon-cyan hover:text-space-black">
-                        ✓ APROBAR
+                              className="admin-btn text-accent border-accent/30 hover:bg-accent/10 hover:border-accent flex items-center gap-1.5">
+                        <CheckIcon /> APROBAR
                       </button>
                       <button onClick={() => updateEstado(p.id, 'CANCELADO')}
-                              className="admin-btn bg-red-500/20 text-red-500 border-red-500 hover:bg-red-500 hover:text-white">
-                        ✕ CANCELAR
+                              className="admin-btn text-red-400 border-red-400/30 hover:bg-red-400/10 hover:border-red-400 flex items-center gap-1.5">
+                        <XIcon /> CANCELAR
                       </button>
                     </>
                   )}
                   {p.estado_pedido === 'PAGADO' && (
                     <button onClick={() => setTrackingModal(p.id)}
-                            className="admin-btn bg-fire-orange/20 text-fire-orange border-fire-orange hover:bg-fire-orange hover:text-space-black">
-                      📦 DESPACHAR
+                            className="admin-btn text-amber border-amber/30 hover:bg-amber/10 hover:border-amber flex items-center gap-1.5">
+                      <TruckIcon /> DESPACHAR
                     </button>
                   )}
                 </div>
@@ -134,21 +141,20 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Modal Tracking */}
       {trackingModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in"
              onClick={() => setTrackingModal(null)}>
-          <div className="bg-space-black border-2 border-neon-cyan p-6 w-full max-w-md space-y-4"
+          <div className="glass-card p-6 w-full max-w-md space-y-4 animate-scale-in"
                onClick={(e) => e.stopPropagation()}>
-            <h2 className="font-black text-lg">INGRESAR CÓDIGO STARKEN</h2>
+            <h2 className="font-bold text-base">INGRESAR CODIGO STARKEN</h2>
             <input value={codigoTracking} onChange={(e) => setCodigoTracking(e.target.value)}
-                   placeholder="N° de Orden de Flete" className="input-field" />
+                   placeholder="N de Orden de Flete" className="input-field" />
             <div className="flex gap-3">
               <button onClick={() => setTrackingModal(null)}
-                      className="btn-secondary flex-1 text-sm">CANCELAR</button>
+                      className="btn-secondary flex-1 text-[10px]">CANCELAR</button>
               <button onClick={() => updateEstado(trackingModal, 'ENVIADO', codigoTracking)}
                       disabled={!codigoTracking}
-                      className="btn-primary flex-1 text-sm">CONFIRMAR ENVÍO</button>
+                      className="btn-primary flex-1 text-[10px]">CONFIRMAR ENVIO</button>
             </div>
           </div>
         </div>

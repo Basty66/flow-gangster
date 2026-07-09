@@ -105,7 +105,7 @@ const productos = [
     marca: 'ASICS',
     precio: 165000,
     descripcion: 'El revival tech-runner. Malla plateada con overlays crema. Gel cushioning y aesthetic Y2K puro. Para los que buscan diferenciarse.',
-    imagen_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800&q=80',
+    imagen_url: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=800&q=80',
     modalidad: 'ENCARGO',
     tiempo_espera_dias: 15,
     talles: [
@@ -141,11 +141,11 @@ async function seed() {
           [prodId, t.talle, t.cantidad]
         );
       }
-      const badge = p.modalidad === 'STOCK' ? '📦' : '🔥';
+      const badge = p.modalidad === 'STOCK' ? '[STOCK]' : '[ENCARGO]';
       console.log(badge + ' ' + p.nombre + ' — $' + p.precio.toLocaleString('es-CL'));
     }
 
-    console.log('\n✅ ' + productos.length + ' productos cargados.');
+    console.log('\nOK ' + productos.length + ' productos cargados.');
     process.exit(0);
   } catch (e) {
     console.error('Error:', e.message);
