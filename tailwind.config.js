@@ -3,7 +3,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Syne', 'sans-serif'],
+        display: ['"Bebas Neue"', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
       },
       colors: {

@@ -11,8 +11,13 @@ export default function QuickCart() {
 
   useEffect(() => {
     const handleKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    const toggle = () => setOpen((v) => !v);
     document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    window.addEventListener('toggle-cart', toggle);
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      window.removeEventListener('toggle-cart', toggle);
+    };
   }, []);
 
   const validarCupon = async () => {

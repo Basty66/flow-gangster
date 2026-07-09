@@ -2,44 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap');
+
 @layer base {
   * { @apply m-0 p-0 box-border; }
-  body { @apply font-body antialiased; }
+  body { @apply font-body antialiased bg-[#0a0118]; scroll-behavior: smooth; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0a0118; }
+  ::-webkit-scrollbar-thumb { background: #22d3ee; }
 }
 
 @layer components {
   .btn-primary {
     @apply bg-gradient-to-r from-neon-cyan to-neon-pink text-white font-black
-           uppercase tracking-wider px-8 py-4 border-2 border-white
-           hover:scale-105 transition-all duration-300
-           shadow-[4px_4px_0px_0px_rgba(255,255,255,0.15)]
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+           uppercase tracking-[0.2em] px-10 py-5 border-2 border-white/50
+           hover:scale-[1.04] hover:shadow-[0_0_40px_rgba(34,211,238,0.3)]
+           transition-all duration-300 relative overflow-hidden text-sm;
   }
+  .btn-primary::after {
+    content: '';
+    @apply absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300;
+  }
+  .btn-primary:hover::after { @apply opacity-100; }
+
   .btn-secondary {
-    @apply bg-transparent text-white font-black uppercase tracking-wider
-           px-6 py-3 border-2 border-white
-           hover:bg-white hover:text-space-black transition-all duration-300;
+    @apply bg-transparent text-white font-black uppercase tracking-[0.15em]
+           px-8 py-4 border-2 border-white/30 text-sm
+           hover:bg-white hover:text-[#0a0118] hover:border-white transition-all duration-300;
   }
+
   .badge-instant {
-    @apply bg-gangster-purple text-neon-cyan text-xs font-black px-3 py-1
-           uppercase tracking-widest border border-neon-cyan;
+    @apply bg-[#4c1d95] text-neon-cyan text-[10px] font-black px-3 py-1.5
+           uppercase tracking-[0.2em] border border-neon-cyan/50
+           shadow-[0_0_15px_rgba(34,211,238,0.2)];
   }
   .badge-preorder {
-    @apply bg-fire-orange text-black text-xs font-black px-3 py-1
-           uppercase tracking-widest;
+    @apply bg-fire-orange text-black text-[10px] font-black px-3 py-1.5
+           uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(249,115,22,0.3)];
   }
+
   .card-product {
-    @apply border-2 border-white/10 bg-space-black/60 backdrop-blur-sm
-           hover:border-neon-cyan/50 transition-all duration-300
-           shadow-[6px_6px_0px_0px_rgba(34,211,238,0.1)];
+    @apply relative overflow-hidden border border-white/10 bg-[#0d0221]/80
+           hover:border-neon-cyan/40 transition-all duration-500;
   }
+  .card-product::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-500
+           bg-gradient-to-t from-neon-cyan/5 to-transparent;
+  }
+  .card-product:hover::before { @apply opacity-100; }
+
   .input-field {
-    @apply w-full bg-space-black border-2 border-white/20 text-white px-4 py-3
-           font-body focus:border-neon-cyan focus:outline-none
-           placeholder:text-white/30 transition-colors;
+    @apply w-full bg-[#0d0221] border-2 border-white/10 text-white px-5 py-4
+           font-body text-sm focus:border-neon-cyan/50 focus:outline-none
+           placeholder:text-white/20 transition-all duration-300;
   }
+
   .admin-btn {
-    @apply px-4 py-2 font-black uppercase tracking-wider text-sm
-           border-2 border-white/30 hover:border-white transition-all duration-200;
+    @apply px-5 py-2.5 font-black uppercase tracking-[0.15em] text-xs
+           border-2 border-white/20 hover:border-white transition-all duration-200;
+  }
+
+  .glass-panel {
+    @apply bg-[#0d0221]/60 backdrop-blur-xl border border-white/10;
+  }
+
+  .urban-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5;
+  }
+
+  .hero-text {
+    @apply font-['Bebas_Neue'] tracking-tighter;
   }
 }

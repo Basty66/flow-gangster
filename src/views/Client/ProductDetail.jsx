@@ -25,15 +25,16 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
-        <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-2 border-neon-pink border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!producto) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center pt-20 gap-4">
-        <p className="font-black text-2xl">PRODUCTO NO ENCONTRADO</p>
+      <div className="min-h-screen flex flex-col items-center justify-center pt-20 gap-6">
+        <p className="hero-text text-7xl font-black text-white/10">404</p>
+        <p className="font-black text-lg tracking-wider">PRODUCTO NO ENCONTRADO</p>
         <Link to="/" className="btn-primary text-sm">VOLVER A TIENDA</Link>
       </div>
     );
@@ -53,98 +54,119 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="pt-24 pb-16">
+    <div className="pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-4">
-        <Link to="/" className="inline-block font-black uppercase text-sm tracking-wider
-                                text-white/60 hover:text-neon-cyan transition-colors mb-8">
-          ← VOLVER
+        <Link to="/" className="inline-flex items-center gap-2 font-black text-xs tracking-[0.2em] uppercase
+                                text-white/30 hover:text-neon-cyan transition-colors mb-8 group">
+          <span className="group-hover:-translate-x-1 transition-transform">←</span>
+          VOLVER
         </Link>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          {/* Imagen */}
-          <div className="card-product overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+          {/* Image */}
+          <div className="card-product aspect-square overflow-hidden border-neon-cyan/10">
             <img src={producto.imagen_url} alt={producto.nombre}
-                 className="w-full aspect-square object-cover" />
+                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
           </div>
 
           {/* Info */}
-          <div className="space-y-6">
+          <div className="space-y-8">
+            {/* Badge + Marca */}
             <div>
-              {producto.modalidad === 'STOCK' ? (
-                <span className="badge-instant">INSTANT DROP</span>
-              ) : (
-                <span className="badge-preorder">PRE-ORDER V.01</span>
-              )}
+              <div className="flex items-center gap-3 mb-4">
+                {producto.modalidad === 'STOCK' ? (
+                  <span className="badge-instant">INSTANT DROP</span>
+                ) : (
+                  <span className="badge-preorder">PRE-ORDER V.01</span>
+                )}
+                <span className="text-white/20 text-[10px] font-black tracking-[0.2em]">{producto.marca}</span>
+              </div>
+
+              <h1 className="hero-text text-5xl md:text-7xl font-black leading-none tracking-tight mb-4">
+                {producto.nombre}
+              </h1>
+
+              <p className="font-display text-5xl font-black text-neon-cyan tracking-tight">
+                ${producto.precio.toLocaleString('es-CL')}
+              </p>
             </div>
 
-            <p className="text-white/50 text-sm font-black uppercase tracking-widest">{producto.marca}</p>
-            <h1 className="font-display text-4xl md:text-5xl font-black">{producto.nombre}</h1>
-
-            <p className="text-neon-cyan font-black text-4xl">${producto.precio.toLocaleString('es-CL')}</p>
-
+            {/* Encargo warning */}
             {producto.modalidad === 'ENCARGO' && (
-              <div className="bg-fire-orange/10 border-2 border-fire-orange p-4">
-                <p className="font-black text-fire-orange uppercase text-sm tracking-wider">
-                  ⚠ Este artículo se trae bajo pedido
+              <div className="bg-fire-orange/5 border-2 border-fire-orange/30 p-6">
+                <p className="font-black text-fire-orange uppercase text-sm tracking-[0.15em] mb-2">
+                  ⚠ ARTÍCULO BAJO PEDIDO
                 </p>
-                <p className="text-white/70 text-sm mt-1">
-                  Tiempo estimado de entrega: {producto.tiempo_espera_dias || 15} días hábiles.
-                  Al reservar, aseguras tu par.
+                <p className="text-white/50 text-sm leading-relaxed">
+                  Este modelo se importa exclusivamente para vos. Tiempo estimado de entrega:{' '}
+                  <span className="font-black text-white">{producto.tiempo_espera_dias || 15} días hábiles</span>.
+                  Al reservar, asegurás tu par y no perdés el drop.
                 </p>
               </div>
             )}
 
-            <p className="text-white/70 text-sm leading-relaxed">{producto.descripcion}</p>
+            {/* Description */}
+            <p className="text-white/40 text-sm leading-relaxed font-body">{producto.descripcion}</p>
 
-            {/* Selector de talle */}
+            {/* Size selector */}
             <div>
-              <p className="font-black uppercase text-sm tracking-wider mb-3">Seleccionar Talle</p>
-              <div className="flex flex-wrap gap-2">
+              <p className="font-black text-xs tracking-[0.2em] uppercase text-white/40 mb-4">
+                Seleccionar Talle
+              </p>
+              <div className="grid grid-cols-5 sm:grid-cols-7 gap-2">
                 {tallesDisponibles.map((t) => (
                   <button key={t.talle} onClick={() => setTalleSeleccionado(t.talle)}
-                          className={`min-w-[60px] px-4 py-3 border-2 font-black text-sm
-                                    transition-all duration-200 ${
-                                      talleSeleccionado === t.talle
-                                        ? 'border-fire-orange text-fire-orange shadow-[0_0_10px_#f97316]'
-                                        : 'border-white/20 text-white/60 hover:border-white/50'
-                                    }`}>
+                          className={`py-4 border-2 font-black text-sm transition-all duration-300 ${
+                            talleSeleccionado === t.talle
+                              ? 'border-fire-orange text-fire-orange bg-fire-orange/5 shadow-[0_0_20px_rgba(249,115,22,0.15)]'
+                              : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white/70'
+                          }`}>
                     {t.talle}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Cantidad */}
-            <div className="flex items-center gap-4">
-              <p className="font-black uppercase text-sm tracking-wider">Cantidad:</p>
-              <div className="flex items-center border-2 border-white/20">
+            {/* Quantity */}
+            <div className="flex items-center gap-6">
+              <p className="font-black text-xs tracking-[0.2em] uppercase text-white/40">Cantidad</p>
+              <div className="flex items-center border-2 border-white/10">
                 <button onClick={() => setCantidad(Math.max(1, cantidad - 1))}
-                        className="px-4 py-2 font-black hover:bg-white hover:text-space-black transition-colors">−</button>
-                <span className="px-4 py-2 font-black border-x border-white/20">{cantidad}</span>
+                        className="w-12 h-12 font-black text-lg hover:bg-white hover:text-[#0a0118] transition-colors">−</button>
+                <span className="w-12 h-12 font-black text-lg flex items-center justify-center border-x border-white/10">
+                  {cantidad}
+                </span>
                 <button onClick={() => setCantidad(cantidad + 1)}
-                        className="px-4 py-2 font-black hover:bg-white hover:text-space-black transition-colors">+</button>
+                        className="w-12 h-12 font-black text-lg hover:bg-white hover:text-[#0a0118] transition-colors">+</button>
               </div>
             </div>
 
             {/* Stock info */}
             {producto.modalidad === 'STOCK' && stockTalle && (
-              <p className="text-white/50 text-sm">
-                Stock disponible:{' '}
-                <span className={parseInt(stockTalle.cantidad) <= 2 ? 'text-fire-orange font-black' : 'text-white'}>
-                  {stockTalle.cantidad} pares
+              <p className="text-xs tracking-wider font-body">
+                Stock: {' '}
+                <span className={parseInt(stockTalle.cantidad) <= 2 ? 'text-fire-orange font-black' : 'text-white/50'}>
+                  {stockTalle.cantidad} pares disponibles
                 </span>
+                {parseInt(stockTalle.cantidad) <= 2 && (
+                  <span className="text-fire-orange font-black ml-2 animate-pulse">¡ÚLTIMOS!</span>
+                )}
               </p>
             )}
 
+            {/* Add to cart */}
             <button onClick={handleAdd} disabled={!talleSeleccionado}
-                    className={`btn-primary w-full text-center text-lg ${
+                    className={`btn-primary w-full text-center text-lg relative overflow-hidden ${
                       added ? '!bg-gradient-to-r !from-neon-cyan !to-neon-pink' : ''
                     }`}>
-              {added ? '✓ AGREGADO AL CARRITO' : 'AGREGAR AL CARRITO'}
+              {added ? '✓ AGREGADO AL CARRITO' : !talleSeleccionado ? 'SELECCIONA UN TALLE' : 'AGREGAR AL CARRITO'}
             </button>
 
             {added && (
-              <Link to="/checkout" className="block text-center text-neon-cyan font-black text-sm underline underline-offset-4">
+              <Link to="/checkout"
+                    className="block text-center text-neon-cyan font-black text-sm tracking-wider
+                             underline underline-offset-4 decoration-neon-cyan/30 hover:decoration-neon-cyan
+                             transition-all">
                 IR AL CARRITO →
               </Link>
             )}
