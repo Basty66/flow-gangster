@@ -9,9 +9,20 @@ export default async function handler(req, res) {
     try {
       const pool = getPool();
       let query = `
-        SELECT p.*, json_agg(dp.*) as detalle
+        SELECT p.*,
+               json_agg(
+                 json_build_object(
+                   'id', dp.id,
+                   'producto_id', dp.producto_id,
+                   'talle', dp.talle,
+                   'cantidad', dp.cantidad,
+                   'producto_nombre', pr.nombre,
+                   'producto_marca', pr.marca
+                 )
+               ) FILTER (WHERE dp.id IS NOT NULL) as detalle
         FROM pedidos p
         LEFT JOIN detalle_pedidos dp ON dp.pedido_id = p.id
+        LEFT JOIN productos pr ON pr.id = dp.producto_id
       `;
       const params = [];
       if (estado) {

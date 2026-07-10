@@ -10,15 +10,18 @@ export default function Dashboard() {
   const [filtro, setFiltro] = useState('');
   const [trackingModal, setTrackingModal] = useState(null);
   const [codigoTracking, setCodigoTracking] = useState('');
+  const [error, setError] = useState('');
 
   const fetchPedidos = async (estado) => {
     setLoading(true);
+    setError('');
     try {
       const url = estado ? `/api/admin/pedidos?estado=${estado}` : '/api/admin/pedidos';
       const res = await fetch(url, { headers: { ...getAuthHeaders() } });
       const data = await res.json();
       if (res.ok) setPedidos(data);
-    } catch (e) { console.error(e); }
+      else setError(data.error || 'Error al cargar pedidos');
+    } catch (e) { setError('Error de conexión'); }
     setLoading(false);
   };
 
@@ -56,6 +59,12 @@ export default function Dashboard() {
           </button>
         ))}
       </div>
+
+      {error && (
+        <div className="mb-6 px-4 py-3 border border-red-900/30 bg-red-950/20">
+          <p className="text-red-400 text-xs font-mono">{error}</p>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center py-20">

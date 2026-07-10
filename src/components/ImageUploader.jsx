@@ -1,6 +1,31 @@
 import { useState, useRef } from 'react';
 
 const MAX_SIZE = 2 * 1024 * 1024;
+const MAX_DIM = 1200;
+const JPEG_QUALITY = 0.8;
+
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > MAX_DIM || height > MAX_DIM) {
+        const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      const base64 = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
+      resolve(base64);
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
 
 export default function ImageUploader({ onUpload, currentUrl }) {
   const [preview, setPreview] = useState(currentUrl || '');
@@ -9,17 +34,21 @@ export default function ImageUploader({ onUpload, currentUrl }) {
   const [processing, setProcessing] = useState(false);
   const inputRef = useRef(null);
 
-  const handleFile = (e) => {
+  const handleFile = async (e) => {
     const file = e.target.files?.[0] || e.dataTransfer?.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { setError('Solo se permiten imagenes'); return; }
     if (file.size > MAX_SIZE) { setError('Max 2MB'); return; }
     setError('');
     setProcessing(true);
-    const reader = new FileReader();
-    reader.onload = (ev) => { const base64 = ev.target.result; setPreview(base64); onUpload(base64); setProcessing(false); };
-    reader.onerror = () => { setError('Error al leer'); setProcessing(false); };
-    reader.readAsDataURL(file);
+    try {
+      const base64 = await compressImage(file);
+      setPreview(base64);
+      onUpload(base64);
+    } catch {
+      setError('Error al procesar imagen');
+    }
+    setProcessing(false);
   };
 
   const handleDrop = (e) => { e.preventDefault(); setDragOver(false); handleFile({ target: { files: e.dataTransfer.files } }); };

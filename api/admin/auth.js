@@ -3,7 +3,7 @@ import getPool from '../db.js';
 
 const JWT_SECRET = () => process.env.JWT_SECRET || 'fallback-secret-change-me';
 const ADMIN_USER = () => process.env.ADMIN_USER || 'admin';
-const ADMIN_PASS = () => process.env.ADMIN_PASS || 'flowgangster';
+const ADMIN_PASS = () => process.env.ADMIN_PASS || 'admin123';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

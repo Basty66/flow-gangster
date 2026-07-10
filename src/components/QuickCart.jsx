@@ -72,6 +72,7 @@ export default function QuickCart() {
                   <div className="flex-1 min-w-0">
                     <p className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase mb-0.5">{item.producto.marca}</p>
                     <p className="font-display font-bold text-sm text-white truncate">{item.producto.nombre}</p>
+                    {item.talle && <p className="font-mono text-[9px] text-[#555] tracking-[0.1em]">Talle: {item.talle}</p>}
                     <p className="font-display font-bold text-sm text-orange mt-1">
                       ${Number(item.producto.precio).toLocaleString('es-CL')}
                     </p>
@@ -80,15 +81,15 @@ export default function QuickCart() {
                     )}
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <button onClick={() => removeItem(item.producto.id)}
+                    <button onClick={() => removeItem(item.producto.id, item.talle)}
                             className="text-[#555] hover:text-white transition-colors duration-150 text-xs">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                     </button>
                     <div className="flex items-center gap-0 border border-[#333]">
-                      <button onClick={() => { if (item.cantidad > 1) updateCantidad(item.producto.id, item.cantidad - 1); }}
+                      <button onClick={() => { if (item.cantidad > 1) updateCantidad(item.producto.id, item.talle, item.cantidad - 1); }}
                               className="px-2 py-0.5 text-[#666] hover:text-white text-xs transition-colors duration-150">−</button>
                       <span className="px-2 py-0.5 text-white text-xs font-bold">{item.cantidad}</span>
-                      <button onClick={() => updateCantidad(item.producto.id, item.cantidad + 1)}
+                      <button onClick={() => updateCantidad(item.producto.id, item.talle, item.cantidad + 1)}
                               className="px-2 py-0.5 text-[#666] hover:text-white text-xs transition-colors duration-150">+</button>
                     </div>
                   </div>

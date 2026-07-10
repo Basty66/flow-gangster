@@ -13,36 +13,71 @@ function Skeleton() {
   );
 }
 
+function extractProducto(data) {
+  if (!data) return null;
+  if (Array.isArray(data)) return data.length > 0 ? data[0] : null;
+  if (typeof data === 'object' && data.id) return data;
+  return null;
+}
+
 export default function ProductDetail() {
   const { id } = useParams();
   const { addItem } = useCart();
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [imgError, setImgError] = useState(false);
   const [added, setAdded] = useState(false);
   const [talleSel, setTalleSel] = useState(null);
 
-  const talles = ['38','39','40','41','42','43','44','45'];
-
   useEffect(() => {
+    if (!id) { setError('ID de producto no válido'); setLoading(false); return; }
     setLoading(true);
-    fetch(`/api/productos?id=${id}`)
-      .then((r) => r.ok ? r.json() : Promise.reject())
-      .then((data) => { setProducto(data); setLoading(false); })
-      .catch(() => setLoading(false));
+    setError('');
+    setTalleSel(null);
+    setAdded(false);
+    setImgError(false);
+    fetch(`/api/productos?id=${encodeURIComponent(id)}`)
+      .then(async (r) => {
+        if (!r.ok) {
+          const d = await r.json().catch(() => ({}));
+          throw new Error(d.error || `Error ${r.status}`);
+        }
+        return r.json();
+      })
+      .then((data) => {
+        const prod = extractProducto(data);
+        if (!prod) {
+          setError('Producto no encontrado');
+        } else {
+          setProducto(prod);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message || 'Error al cargar producto');
+        setLoading(false);
+      });
   }, [id]);
 
   if (loading) return <Skeleton />;
-  if (!producto) return (
+
+  if (error || !producto) return (
     <div className="pt-28 pb-20 text-center px-4">
       <p className="font-display font-black text-7xl text-[#1a1a1a]">404</p>
-      <p className="text-[#666] mt-4 mb-6">Producto no encontrado</p>
+      <p className="text-[#666] mt-4 mb-6">{error || 'Producto no encontrado'}</p>
       <Link to="/" className="btn btn-primary">Volver a Tienda</Link>
     </div>
   );
 
   const isStock = producto.modalidad === 'STOCK';
   const isOffer = producto.precio_oferta && producto.oferta_hasta;
+  const stockMap = {};
+  if (producto.talles) {
+    producto.talles.forEach((t) => { stockMap[t.talle] = t.cantidad; });
+  }
+  const tallesDisponibles = producto.talles ? producto.talles.filter((t) => t.cantidad > 0).map((t) => t.talle) : [];
+  const tallesTodos = producto.talles ? producto.talles.map((t) => t.talle) : [];
 
   return (
     <div className="pt-24 pb-20">
@@ -58,7 +93,7 @@ export default function ProductDetail() {
             {producto.imagen_url && !imgError ? (
               <img
                 src={producto.imagen_url}
-                alt={producto.nombre}
+                alt={producto.nombre || ''}
                 className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.08]"
                 onError={() => setImgError(true)}
               />
@@ -107,31 +142,57 @@ export default function ProductDetail() {
             </div>
 
             <div className="p-6 sm:p-8 border-b border-[#333]">
-              <p className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase mb-4">Seleccionar Talle</p>
-              <div className="grid grid-cols-4 gap-1">
-                {talles.map((t) => {
-                  const selected = talleSel === t;
-                  return (
-                    <button key={t} onClick={() => setTalleSel(t)}
-                            className={`py-3 text-xs font-bold tracking-wide transition-all duration-200 border ${
-                              selected
-                                ? 'bg-orange text-black border-orange'
-                                : 'bg-transparent text-[#666] border-[#333] hover:border-[#666] hover:text-white'
-                            }`}>
-                      {t}
-                    </button>
-                  );
-                })}
-              </div>
+              <p className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase mb-4">
+                Seleccionar Talle
+                {talleSel && <span className="text-orange ml-2">✓ {talleSel}</span>}
+              </p>
+              {tallesTodos.length > 0 ? (
+                <div className="grid grid-cols-4 gap-1">
+                  {tallesTodos.map((t) => {
+                    const stock = stockMap[t] || 0;
+                    const selected = talleSel === t;
+                    const sinStock = stock < 1;
+                    return (
+                      <button key={t}
+                              onClick={() => !sinStock && setTalleSel(t)}
+                              disabled={sinStock}
+                              className={`py-3 text-xs font-bold tracking-wide transition-all duration-200 border ${
+                                selected
+                                  ? 'bg-orange text-black border-orange'
+                                  : sinStock
+                                    ? 'bg-transparent text-[#333] border-[#1a1a1a] cursor-not-allowed line-through'
+                                    : 'bg-transparent text-[#666] border-[#333] hover:border-[#666] hover:text-white'
+                              }`}>
+                        {t}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-[#555] text-[10px] font-mono tracking-[0.1em]">Sin talles disponibles</p>
+              )}
+              {tallesDisponibles.length === 0 && tallesTodos.length > 0 && (
+                <p className="text-[#555] text-[10px] font-mono tracking-[0.1em] mt-3">Sin stock disponible</p>
+              )}
             </div>
 
             <div className="p-6 sm:p-8 space-y-4">
               {producto.stock > 0 ? (
-                <button onClick={() => { addItem(producto); setAdded(true); setTimeout(() => setAdded(false), 1500); }}
+                <button onClick={() => {
+                  if (!talleSel) return;
+                  addItem(producto, talleSel);
+                  setAdded(true);
+                  setTimeout(() => setAdded(false), 1500);
+                }}
+                        disabled={!talleSel}
                         className={`btn w-full justify-center py-3 text-xs transition-all duration-200 ${
-                          added ? 'bg-orange text-black' : 'btn-primary'
+                          !talleSel
+                            ? 'bg-[#111] text-[#444] cursor-default'
+                            : added
+                              ? 'bg-orange text-black'
+                              : 'btn-primary'
                         }`}>
-                  {added ? '✓ AGREGADO' : isStock ? 'AGREGAR AL CARRO' : 'ENCARGAR AHORA'}
+                  {!talleSel ? 'SELECCIONA UN TALLE' : added ? '✓ AGREGADO' : isStock ? 'AGREGAR AL CARRO' : 'ENCARGAR AHORA'}
                 </button>
               ) : (
                 <button disabled className="btn w-full py-3 text-xs bg-[#111] text-[#444] cursor-default">

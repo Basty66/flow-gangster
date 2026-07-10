@@ -6,7 +6,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { codigo, total_actual } = req.body;
+  const { codigo, total_actual, total } = req.body;
+  const monto = total_actual || total || 0;
 
   if (!codigo) {
     return res.status(400).json({ error: 'Código de cupón requerido' });
@@ -40,11 +41,11 @@ export default async function handler(req, res) {
 
     let descuento = 0;
     if (cupon.tipo === 'PERCENT') {
-      descuento = Math.round((total_actual * cupon.valor) / 100);
+      descuento = Math.round((monto * cupon.valor) / 100);
     } else {
       descuento = cupon.valor;
     }
-    if (descuento > total_actual) descuento = total_actual;
+    if (descuento > monto) descuento = monto;
 
     return res.status(200).json({
       valido: true,

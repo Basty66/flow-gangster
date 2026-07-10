@@ -1,18 +1,9 @@
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
 import { useState } from 'react';
 
 export default function ProductCard({ producto, index }) {
-  const { addItem } = useCart();
   const [imgError, setImgError] = useState(false);
-  const [added, setAdded] = useState(false);
   const isStock = producto.modalidad === 'STOCK';
-
-  const handleAdd = () => {
-    addItem(producto);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1200);
-  };
 
   return (
     <div className="group relative bg-black transition-all duration-300 hover:z-10">
@@ -80,17 +71,21 @@ export default function ProductCard({ producto, index }) {
         </div>
       </div>
 
-      <button onClick={handleAdd}
-              disabled={producto.stock < 1}
-              className={`btn w-full border-t border-[#222] rounded-none text-[10px] py-2.5 transition-all duration-200 ${
-                producto.stock < 1
-                  ? 'bg-[#111] text-[#444] cursor-default'
-                  : added
-                    ? 'bg-orange text-black'
-                    : 'bg-[#111] text-[#666] hover:bg-orange hover:text-black'
-              }`}>
-        {producto.stock < 1 ? 'AGOTADO' : added ? '✓ AGREGADO' : isStock ? 'AGREGAR' : 'ENCARGAR'}
-      </button>
+      <Link to={`/producto/${producto.id}`}
+            className={`btn w-full border-t border-[#222] rounded-none text-[10px] py-2.5 transition-all duration-200 flex items-center justify-center gap-2 ${
+              producto.stock < 1
+                ? 'bg-[#111] text-[#444] cursor-default pointer-events-none'
+                : 'bg-[#111] text-[#666] hover:bg-orange hover:text-black'
+            }`}>
+        {producto.stock < 1 ? (
+          'AGOTADO'
+        ) : (
+          <>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            {isStock ? 'AGREGAR' : 'ENCARGAR'}
+          </>
+        )}
+      </Link>
     </div>
   );
 }

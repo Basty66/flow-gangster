@@ -10,11 +10,16 @@ function loadCart() {
   } catch { return []; }
 }
 
+function cartKey(productoId, talle) {
+  return `${productoId}_${talle || ''}`;
+}
+
 function cartReducer(state, action) {
   switch (action.type) {
     case 'ADD_ITEM': {
       const { producto, talle, cantidad } = action.payload;
-      const idx = state.findIndex((i) => i.producto.id === producto.id);
+      const key = cartKey(producto.id, talle);
+      const idx = state.findIndex((i) => cartKey(i.producto.id, i.talle) === key);
       if (idx >= 0) {
         const next = [...state];
         next[idx] = { ...next[idx], cantidad: next[idx].cantidad + cantidad };
@@ -22,10 +27,13 @@ function cartReducer(state, action) {
       }
       return [...state, { producto, talle, cantidad }];
     }
-    case 'REMOVE_ITEM':
-      return state.filter((i) => i.producto.id !== action.payload);
+    case 'REMOVE_ITEM': {
+      const key = cartKey(action.payload.id, action.payload.talle);
+      return state.filter((i) => cartKey(i.producto.id, i.talle) !== key);
+    }
     case 'UPDATE_CANTIDAD': {
-      const idx = state.findIndex((i) => i.producto.id === action.payload.id);
+      const key = cartKey(action.payload.id, action.payload.talle);
+      const idx = state.findIndex((i) => cartKey(i.producto.id, i.talle) === key);
       if (idx < 0) return state;
       const next = [...state];
       next[idx] = { ...next[idx], cantidad: Math.max(1, action.payload.cantidad) };
@@ -50,11 +58,11 @@ export function CartProvider({ children }) {
   const addItem = (producto, talle, cantidad = 1) =>
     dispatch({ type: 'ADD_ITEM', payload: { producto, talle, cantidad } });
 
-  const removeItem = (id) =>
-    dispatch({ type: 'REMOVE_ITEM', payload: id });
+  const removeItem = (id, talle) =>
+    dispatch({ type: 'REMOVE_ITEM', payload: { id, talle } });
 
-  const updateCantidad = (id, cantidad) =>
-    dispatch({ type: 'UPDATE_CANTIDAD', payload: { id, cantidad } });
+  const updateCantidad = (id, talle, cantidad) =>
+    dispatch({ type: 'UPDATE_CANTIDAD', payload: { id, talle, cantidad } });
 
   const clearCart = () => { setCupon(''); setCuponData(null); dispatch({ type: 'CLEAR' }); };
 

@@ -9,7 +9,9 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const result = await pool.query(`
-        SELECT p.*, json_agg(json_build_object('id', s.id, 'talle', s.talle, 'cantidad', s.cantidad)) as talles
+        SELECT p.*,
+               COALESCE(SUM(s.cantidad), 0)::int as stock,
+               json_agg(json_build_object('id', s.id, 'talle', s.talle, 'cantidad', s.cantidad)) FILTER (WHERE s.talle IS NOT NULL) as talles
         FROM productos p
         LEFT JOIN stock s ON s.producto_id = p.id
         GROUP BY p.id

@@ -9,6 +9,7 @@ export default function Inventory() {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState('');
   const [offerModal, setOfferModal] = useState(null);
   const [offerForm, setOfferForm] = useState({ precio_oferta: '', oferta_hasta: '', etiqueta_oferta: '' });
   const [seeding, setSeeding] = useState(false);
@@ -33,11 +34,13 @@ export default function Inventory() {
 
   const fetchProductos = async () => {
     setLoading(true);
+    setError('');
     try {
       const res = await fetch('/api/admin/productos', { headers: { ...getAuthHeaders() } });
       const data = await res.json();
       if (res.ok) setProductos(data);
-    } catch (e) { console.error(e); }
+      else setError(data.error || 'Error al cargar productos');
+    } catch (e) { setError('Error de conexión'); }
     setLoading(false);
   };
 
@@ -136,6 +139,12 @@ export default function Inventory() {
         </div>
         <p className="text-[#555] font-mono text-[9px] tracking-[0.15em] uppercase">{productos.length} productos</p>
       </div>
+
+      {error && (
+        <div className="mb-6 px-4 py-3 border border-red-900/30 bg-red-950/20">
+          <p className="text-red-400 text-xs font-mono">{error}</p>
+        </div>
+      )}
 
       {showForm && (
         <form onSubmit={createProducto} className="card p-6 mb-10 space-y-5"

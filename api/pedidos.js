@@ -7,13 +7,14 @@ export default async function handler(req, res) {
   }
 
   const {
-    items, // [{ producto_id, talle, cantidad }]
+    items,
     cliente_nombre,
+    cliente_email,
     cliente_whatsapp,
-    tipo_entrega, // 'RETIRAR_SHOWROOM' | 'ENVIO_STARKEN'
-    datos_envio, // { region, comuna, direccion } | null
-    metodo_pago, // 'TRANSFERENCIA' | 'EFECTIVO'
-    cupon_codigo, // string opcional
+    tipo_entrega,
+    datos_envio,
+    metodo_pago,
+    cupon_codigo,
   } = req.body;
 
   if (!items?.length || !cliente_nombre || !cliente_whatsapp || !tipo_entrega || !metodo_pago) {
@@ -115,12 +116,13 @@ export default async function handler(req, res) {
     // 3. Crear pedido
     const pedidoRes = await client.query(
       `INSERT INTO pedidos
-       (cliente_nombre, cliente_whatsapp, tipo_entrega, datos_envio, metodo_pago,
+       (cliente_nombre, cliente_email, cliente_whatsapp, tipo_entrega, datos_envio, metodo_pago,
         cupon_id, subtotal, descuento, total, estado_pedido)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'PENDIENTE_PAGO')
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'PENDIENTE_PAGO')
        RETURNING id`,
       [
         cliente_nombre,
+        cliente_email || null,
         cliente_whatsapp,
         tipo_entrega,
         tipo_entrega === 'ENVIO_STARKEN' ? JSON.stringify(datos_envio) : null,

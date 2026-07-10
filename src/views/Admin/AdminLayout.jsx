@@ -2,10 +2,10 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function AdminLayout() {
-  const { user, logout } = useAuth();
+  const { isAdmin, logout } = useAuth();
   const location = useLocation();
 
-  if (!user) {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black px-4">
         <div className="text-center">
@@ -41,6 +41,12 @@ export default function AdminLayout() {
                   isActive('/admin/inventario') ? 'text-white bg-[#1a1a1a]' : 'text-[#555] hover:text-white'
                 }`}>
             Inventario
+          </Link>
+          <Link to="/admin/cupones"
+                className={`px-3 py-1.5 text-[10px] font-bold tracking-[0.1em] uppercase transition-colors duration-150 ${
+                  isActive('/admin/cupones') ? 'text-white bg-[#1a1a1a]' : 'text-[#555] hover:text-white'
+                }`}>
+            Cupones
           </Link>
           <button onClick={logout}
                   className="ml-4 px-3 py-1.5 text-[10px] font-bold tracking-[0.1em] uppercase text-[#555] hover:text-white transition-colors duration-150">

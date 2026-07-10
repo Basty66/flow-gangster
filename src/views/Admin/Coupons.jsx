@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import AdminLayout from '../../components/AdminLayout';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Coupons() {
@@ -23,32 +22,34 @@ export default function Coupons() {
   };
 
   return (
-    <AdminLayout>
-      <div className="max-w-lg">
-        <h2 className="font-bold text-base mb-6 uppercase tracking-[0.15em]">Crear Cupon de Descuento</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input value={form.codigo} onChange={(e) => setForm({ ...form, codigo: e.target.value.toUpperCase() })}
-                 placeholder="Codigo (Ej: DROP20)" className="input-field uppercase text-xs" required />
-          <div className="flex gap-3">
-            <button type="button" onClick={() => setForm({ ...form, tipo: 'PERCENT' })}
-                    className={`flex-1 py-3 border font-bold text-xs uppercase tracking-wider transition-all ${form.tipo === 'PERCENT' ? 'border-purple text-purple' : 'border-white/10 text-[#525252]'}`}>
-              Porcentaje %
-            </button>
-            <button type="button" onClick={() => setForm({ ...form, tipo: 'FIXED' })}
-                    className={`flex-1 py-3 border font-bold text-xs uppercase tracking-wider transition-all ${form.tipo === 'FIXED' ? 'border-purple text-purple' : 'border-white/10 text-[#525252]'}`}>
-              Monto Fijo $
-            </button>
-          </div>
-          <input value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })}
-                 type="number" placeholder={form.tipo === 'PERCENT' ? 'Porcentaje (Ej: 20)' : 'Monto en CLP (Ej: 5000)'} className="input-field" required />
-          <input value={form.fecha_expiracion} onChange={(e) => setForm({ ...form, fecha_expiracion: e.target.value })}
-                 type="date" className="input-field" required />
-          <input value={form.limite_usos} onChange={(e) => setForm({ ...form, limite_usos: e.target.value })}
-                 type="number" placeholder="Limite de usos" className="input-field" required />
-          {msg.text && <p className={`font-bold text-xs ${msg.type === 'success' ? 'text-cyan' : 'text-orange'}`}>{msg.text}</p>}
-          <button type="submit" className="btn-primary w-full">CREAR CUPON</button>
-        </form>
-      </div>
-    </AdminLayout>
+    <div className="max-w-lg">
+      <p className="font-display font-bold text-sm text-white tracking-[0.08em] uppercase mb-6">Crear Cupon de Descuento</p>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input value={form.codigo} onChange={(e) => setForm({ ...form, codigo: e.target.value.toUpperCase() })}
+               placeholder="Codigo (Ej: DROP20)" className="input text-xs" required />
+        <div className="flex gap-1">
+          <button type="button" onClick={() => setForm({ ...form, tipo: 'PERCENT' })}
+                  className={`flex-1 py-3 text-xs font-bold tracking-[0.1em] uppercase border transition-all ${
+                    form.tipo === 'PERCENT' ? 'bg-orange text-black border-orange' : 'border-[#333] text-[#555] hover:border-[#666]'
+                  }`}>
+            Porcentaje %
+          </button>
+          <button type="button" onClick={() => setForm({ ...form, tipo: 'FIXED' })}
+                  className={`flex-1 py-3 text-xs font-bold tracking-[0.1em] uppercase border transition-all ${
+                    form.tipo === 'FIXED' ? 'bg-orange text-black border-orange' : 'border-[#333] text-[#555] hover:border-[#666]'
+                  }`}>
+            Monto Fijo $
+          </button>
+        </div>
+        <input value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })}
+               type="number" placeholder={form.tipo === 'PERCENT' ? 'Porcentaje (Ej: 20)' : 'Monto en CLP (Ej: 5000)'} className="input text-xs" required />
+        <input value={form.fecha_expiracion} onChange={(e) => setForm({ ...form, fecha_expiracion: e.target.value })}
+               type="date" className="input text-xs" required />
+        <input value={form.limite_usos} onChange={(e) => setForm({ ...form, limite_usos: e.target.value })}
+               type="number" placeholder="Limite de usos" className="input text-xs" required />
+        {msg.text && <p className={`text-xs font-bold ${msg.type === 'success' ? 'text-white' : 'text-[#666]'}`}>{msg.text}</p>}
+        <button type="submit" className="btn btn-primary w-full justify-center text-xs">CREAR CUPON</button>
+      </form>
+    </div>
   );
 }

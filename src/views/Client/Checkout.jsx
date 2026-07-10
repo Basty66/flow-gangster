@@ -71,9 +71,14 @@ export default function Checkout() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...form,
-          items: items.map((i) => ({ id: i.producto.id, cantidad: i.cantidad })),
-          cupon: cupon,
+          cliente_nombre: form.nombre,
+          cliente_email: form.email,
+          cliente_whatsapp: form.telefono,
+          tipo_entrega: 'ENVIO_STARKEN',
+          datos_envio: { region: form.region, comuna: form.comuna, direccion: form.direccion },
+          metodo_pago: 'TRANSFERENCIA',
+          items: items.map((i) => ({ producto_id: i.producto.id, talle: i.talle, cantidad: i.cantidad })),
+          cupon_codigo: cupon || undefined,
         }),
       });
       if (!r.ok) {
@@ -94,8 +99,8 @@ export default function Checkout() {
       <div className="pt-28 pb-20 px-4">
         <div className="max-w-xl mx-auto text-center border border-[#333] p-10">
           <p className="font-display font-black text-6xl text-orange tracking-[-0.04em] mb-4">HECHO!</p>
-          <p className="text-white font-bold text-lg mb-2">Pedido #{success.numero_pedido}</p>
-          <p className="text-[#666] text-sm mb-2">Recibiras un email con los detalles a <strong className="text-white">{success.email}</strong></p>
+          <p className="text-white font-bold text-lg mb-2">Pedido #{success.id}</p>
+          <p className="text-[#666] text-sm mb-2">Recibiras un email con los detalles a <strong className="text-white">{form.email}</strong></p>
           <p className="text-[#555] text-xs mb-8">Te contactaremos por WhatsApp cuando el pedido este listo.</p>
           <div className="border border-[#333] p-4 mb-8 text-left">
             <p className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase mb-3">Datos de Transferencia</p>
@@ -209,10 +214,11 @@ export default function Checkout() {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-mono text-[8px] text-[#555] tracking-[0.15em] uppercase">{item.producto.marca}</p>
-                    <p className="font-display font-bold text-sm text-white truncate">{item.producto.nombre}</p>
-                  </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-mono text-[8px] text-[#555] tracking-[0.15em] uppercase">{item.producto.marca}</p>
+                      <p className="font-display font-bold text-sm text-white truncate">{item.producto.nombre}</p>
+                      {item.talle && <p className="font-mono text-[8px] text-[#555] tracking-[0.1em] mt-0.5">Talle: {item.talle}</p>}
+                    </div>
                   <div className="text-right flex-shrink-0">
                     <p className="font-display font-bold text-sm text-white">x{item.cantidad}</p>
                     <p className="font-display font-bold text-sm text-orange">${Number(item.producto.precio * item.cantidad).toLocaleString('es-CL')}</p>

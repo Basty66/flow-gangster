@@ -1,18 +1,8 @@
 import getPool from './db.js';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = () => process.env.JWT_SECRET || 'fallback-secret-change-me';
+import { verifyAdmin } from './admin/_verify.js';
 
 export default async function handler(req, res) {
-  const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Token requerido' });
-  }
-  try {
-    jwt.verify(auth.split(' ')[1], JWT_SECRET());
-  } catch {
-    return res.status(401).json({ error: 'Token inválido o expirado' });
-  }
+  if (!verifyAdmin(req, res)) return;
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);

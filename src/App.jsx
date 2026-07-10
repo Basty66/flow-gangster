@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import QuickCart from './components/QuickCart';
@@ -10,6 +10,7 @@ import Checkout from './views/Client/Checkout';
 import Seguimiento from './views/Client/Seguimiento';
 import AdminDashboard from './views/Admin/Dashboard';
 import AdminInventory from './views/Admin/Inventory';
+import AdminCoupons from './views/Admin/Coupons';
 import AdminLayout from './views/Admin/AdminLayout';
 
 let clickCount = 0;
@@ -35,6 +36,7 @@ function AppContent() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="inventario" element={<AdminInventory />} />
+          <Route path="cupones" element={<AdminCoupons />} />
         </Route>
       </Routes>
     );
@@ -50,6 +52,7 @@ function AppContent() {
             <Route path="/producto/:id" element={<ProductDetail />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/seguimiento" element={<Seguimiento />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </PageTransition>
       </main>
