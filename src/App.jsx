@@ -1,11 +1,8 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { CartProvider } from './context/CartContext';
-import { AuthProvider } from './context/AuthContext';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import QuickCart from './components/QuickCart';
 import PageTransition from './components/PageTransition';
-import ScrollReveal from './components/ScrollReveal';
 import Home from './views/Client/Home';
 import ProductDetail from './views/Client/ProductDetail';
 import Checkout from './views/Client/Checkout';
@@ -47,7 +44,7 @@ function AppContent() {
       <Navbar onLogoClick={handleLogoClick} />
       <main className="min-h-screen">
         <PageTransition locationKey={location.pathname}>
-          <Routes location={location}>
+          <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/producto/:id" element={<ProductDetail />} />
             <Route path="/checkout" element={<Checkout />} />
@@ -62,13 +59,5 @@ function AppContent() {
 }
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  );
+  return <AppContent />;
 }
