@@ -61,8 +61,8 @@ export default function QuickCart() {
               {items.map((item) => (
                 <div key={item.producto.id} className="flex gap-4 px-6 py-4 border-b border-[#222]">
                   <div className="w-16 h-16 bg-[#0d0d0d] flex-shrink-0 border border-[#333]">
-                    {item.producto.imagen ? (
-                      <img src={item.producto.imagen} alt={item.producto.nombre} className="w-full h-full object-cover" />
+                    {item.producto.imagen_url ? (
+                      <img src={item.producto.imagen_url} alt={item.producto.nombre} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <svg className="w-4 h-4 text-[#333]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>

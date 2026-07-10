@@ -55,9 +55,9 @@ export default function ProductDetail() {
         <div className="grid md:grid-cols-2 gap-0 border border-[#333]"
              style={{ animation: 'fadeUp 0.35s ease-out' }}>
           <div className="aspect-[4/5] overflow-hidden bg-[#0d0d0d] cursor-crosshair group">
-            {producto.imagen && !imgError ? (
+            {producto.imagen_url && !imgError ? (
               <img
-                src={producto.imagen}
+                src={producto.imagen_url}
                 alt={producto.nombre}
                 className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.08]"
                 onError={() => setImgError(true)}

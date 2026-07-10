@@ -18,9 +18,9 @@ export default function ProductCard({ producto, index }) {
     <div className="group relative bg-black transition-all duration-300 hover:z-10">
       <Link to={`/producto/${producto.id}`} className="block">
         <div className="aspect-[4/5] overflow-hidden bg-[#0d0d0d]">
-          {producto.imagen && !imgError ? (
+          {producto.imagen_url && !imgError ? (
             <img
-              src={producto.imagen}
+              src={producto.imagen_url}
               alt={producto.nombre}
               className="w-full h-full object-cover transition-all duration-500 group-hover:scale-[1.06]"
               onError={() => setImgError(true)}
