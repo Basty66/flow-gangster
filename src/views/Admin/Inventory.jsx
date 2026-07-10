@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import AdminLayout from '../../components/AdminLayout';
 import ImageUploader from '../../components/ImageUploader';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,6 +11,20 @@ export default function Inventory() {
   const [showForm, setShowForm] = useState(false);
   const [offerModal, setOfferModal] = useState(null);
   const [offerForm, setOfferForm] = useState({ precio_oferta: '', oferta_hasta: '', etiqueta_oferta: '' });
+  const [seeding, setSeeding] = useState(false);
+
+  const seedData = async () => {
+    if (!confirm('Esto creara productos demo (Nike, Jordan, etc.). Los productos existentes se mantendran. Continuar?')) return;
+    setSeeding(true);
+    try {
+      const res = await fetch('/api/admin/seed', { method: 'POST', headers: { ...getAuthHeaders() } });
+      const data = await res.json();
+      if (res.ok) { fetchProductos(); alert(data.message); }
+      else alert('Error: ' + (data.error || 'desconocido'));
+    } catch (e) { alert('Error de conexion'); }
+    setSeeding(false);
+  };
+
   const [form, setForm] = useState({
     nombre: '', marca: '', precio: '', descripcion: '', imagen_url: '',
     modalidad: 'STOCK', tiempo_espera_dias: '15',
@@ -107,12 +120,20 @@ export default function Inventory() {
   };
 
   return (
-    <AdminLayout>
+    <div className="max-w-7xl mx-auto px-4 pt-6">
       <div className="flex items-center justify-between mb-6">
-        <button onClick={() => setShowForm(!showForm)}
-                className="btn btn-primary text-[10px] flex items-center gap-2">
-          {showForm ? 'CERRAR' : '+ NUEVO PRODUCTO'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowForm(!showForm)}
+                  className="btn btn-primary text-[10px] flex items-center gap-2">
+            {showForm ? 'CERRAR' : '+ NUEVO PRODUCTO'}
+          </button>
+          {productos.length === 0 && !loading && (
+            <button onClick={seedData} disabled={seeding}
+                    className="btn btn-outline text-[10px] flex items-center gap-2">
+              {seeding ? '...' : 'SEED DEMO'}
+            </button>
+          )}
+        </div>
         <p className="text-[#555] font-mono text-[9px] tracking-[0.15em] uppercase">{productos.length} productos</p>
       </div>
 
@@ -271,6 +292,6 @@ export default function Inventory() {
           </div>
         </div>
       )}
-    </AdminLayout>
+    </div>
   );
 }

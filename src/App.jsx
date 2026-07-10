@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import QuickCart from './components/QuickCart';
+import AdminLoginModal from './components/AdminLoginModal';
 import PageTransition from './components/PageTransition';
 import Home from './views/Client/Home';
 import ProductDetail from './views/Client/ProductDetail';
@@ -54,6 +55,7 @@ function AppContent() {
       </main>
       <Footer />
       <QuickCart />
+      <AdminLoginModal />
     </>
   );
 }
