@@ -1,112 +1,143 @@
 import { useState } from 'react';
 
+const ESTADOS = {
+  PENDIENTE: { label: 'Pendiente', desc: 'Pedido recibido, esperando pago', color: '#555' },
+  PAGADO: { label: 'Pagado', desc: 'Pago confirmado, preparando pedido', color: '#555' },
+  ENVIADO: { label: 'Enviado', desc: 'Producto en camino', color: '#ff5a00' },
+  ENTREGADO: { label: 'Entregado', desc: 'Pedido completado', color: '#fff' },
+  CANCELADO: { label: 'Cancelado', desc: 'Pedido cancelado', color: '#444' },
+};
+
+const STEP_MAP = ['PENDIENTE', 'PAGADO', 'ENVIADO', 'ENTREGADO'];
+
 export default function Seguimiento() {
-  const [pedidoId, setPedidoId] = useState('');
-  const [resultado, setResultado] = useState(null);
+  const [codigo, setCodigo] = useState('');
+  const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!pedidoId.trim()) return;
+  const buscar = async () => {
+    if (!codigo.trim()) { setError('Ingresa un numero de pedido'); return; }
     setLoading(true);
     setError('');
-    setResultado(null);
+    setPedido(null);
     try {
-      const res = await fetch(`/api/seguimiento?pedido_id=${pedidoId.trim()}`);
-      const data = await res.json();
-      if (res.ok) setResultado(data);
-      else setError(data.error || 'Pedido no encontrado');
-    } catch {
-      setError('Error de conexion');
-    }
+      const r = await fetch(`/api/pedidos?codigo=${encodeURIComponent(codigo.trim())}`);
+      if (!r.ok) { const d = await r.json(); throw new Error(d.error || 'No encontrado'); }
+      const data = await r.json();
+      setPedido(data);
+    } catch (err) { setError(err.message); }
     setLoading(false);
   };
 
-  const estadoConfig = {
-    PENDIENTE_PAGO: { label: 'Pendiente de Pago', color: '#f59e0b', width: 'w-1/4' },
-    PAGADO: { label: 'Pagado / En Preparacion', color: '#7c3aed', width: 'w-2/4' },
-    ENVIADO: { label: 'Enviado', color: '#2dd4bf', width: 'w-3/4' },
-    CANCELADO: { label: 'Cancelado', color: '#ef4444', width: 'w-full' },
-  };
+  const currentIdx = STEP_MAP.indexOf(pedido?.estado) !== -1 ? STEP_MAP.indexOf(pedido?.estado) : -1;
 
-  const estado = estadoConfig[resultado?.estado_pedido] || { label: 'Desconocido', color: '#666', width: 'w-0' };
+  const estadoInfo = pedido ? ESTADOS[pedido.estado] || { label: pedido.estado, desc: '', color: '#555' } : null;
 
   return (
-    <div className="min-h-screen pt-24 pb-20">
-      <div className="max-w-lg mx-auto px-4">
-        <div className="text-center mb-12">
-          <h1 className="font-display font-black text-4xl md:text-5xl tracking-[-0.02em] mb-3 text-purple">Trackear Pedido</h1>
-          <p className="text-[#666] text-sm">Ingresa tu numero de pedido</p>
+    <div className="pt-24 pb-20 px-4">
+      <div className="max-w-xl mx-auto">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 border border-[#333] mb-5">
+            <span className="w-1 h-1 bg-orange" />
+            <span className="text-[#666] font-mono text-[9px] tracking-[0.2em] uppercase">Tracking</span>
+          </div>
+          <h1 className="font-display font-black text-4xl sm:text-5xl text-white tracking-[-0.03em] mb-3">
+            DONDE ESTA MI <span className="text-orange">PEDIDO</span>
+          </h1>
+          <p className="text-[#666] text-sm">Ingresa tu numero de pedido para ver el estado</p>
         </div>
 
-        <form onSubmit={handleSearch} className="max-w-sm mx-auto mb-10">
-          <div className="relative">
-            <input value={pedidoId} onChange={(e) => setPedidoId(e.target.value)}
-                   placeholder="Numero de pedido"
-                   className="input pr-12 font-mono text-xs tracking-wider text-center h-12 rounded" />
-            <button type="submit" disabled={loading}
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded flex items-center justify-center text-[#555] hover:text-[#f5f5f5] hover:bg-surface2 transition-all disabled:opacity-50">
-              {loading ? (
-                <div className="w-3 h-3 border border-purple border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-              )}
-            </button>
-          </div>
-        </form>
+        <div className="flex gap-0 mb-8">
+          <input value={codigo} onChange={(e) => setCodigo(e.target.value.toUpperCase())}
+                 onKeyDown={(e) => e.key === 'Enter' && buscar()}
+                 placeholder="ej: FG-0001"
+                 className="input flex-1 text-sm border-r-0 font-mono" />
+          <button onClick={buscar} disabled={loading}
+                  className={`px-6 py-3 text-xs font-bold tracking-[0.1em] uppercase bg-orange text-black hover:bg-orange-light transition-colors duration-150 ${loading ? 'opacity-30' : ''}`}>
+            {loading ? '...' : 'BUSCAR'}
+          </button>
+        </div>
 
         {error && (
-          <div className="text-center animate-fade-in">
-            <div className="card p-5 max-w-sm mx-auto">
-              <p className="text-amber font-medium text-sm">{error}</p>
-              <p className="text-[#555] text-xs mt-1">Verifica e intenta nuevamente</p>
-            </div>
+          <div className="border border-[#333] px-4 py-3 mb-6">
+            <p className="text-[#666] text-sm">{error}</p>
           </div>
         )}
 
-        {resultado && (
-          <div className="space-y-4 animate-fade-up">
-            <div className="card p-6">
-              <div className="flex items-center justify-between mb-4">
+        {pedido && (
+          <div className="border border-[#333]">
+            <div className="p-6 border-b border-[#333]">
+              <div className="flex justify-between items-start mb-2">
                 <div>
-                  <p className="text-[#666] text-xs">Pedido</p>
-                  <p className="font-mono font-bold text-base text-[#f5f5f5]">#{resultado.id?.slice(0, 8).toUpperCase()}</p>
+                  <p className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase mb-1">Pedido</p>
+                  <p className="font-display font-black text-3xl text-white tracking-[-0.02em]">{pedido.numero_pedido}</p>
                 </div>
-                <span className="text-xs font-medium uppercase tracking-wider px-3 py-1.5 rounded border" style={{ color: estado.color, borderColor: estado.color + '30', background: estado.color + '10' }}>
-                  {estado.label}
+                <span className="px-3 py-1 text-[10px] font-bold tracking-[0.1em] uppercase border border-[#333]"
+                      style={{ color: estadoInfo?.color, borderColor: estadoInfo?.color + '33' }}>
+                  {estadoInfo?.label}
                 </span>
               </div>
+              <p className="text-[#666] text-sm">{estadoInfo?.desc}</p>
+            </div>
 
-              <div className="w-full h-1 rounded-full bg-[#2a2a2a] overflow-hidden mb-3">
-                <div className={`h-full rounded-full transition-all duration-1000 ${estado.width}`} style={{ background: estado.color }} />
+            {/* Progress bar */}
+            <div className="px-6 py-6 border-b border-[#333]">
+              <div className="flex justify-between mb-3">
+                {STEP_MAP.map((s, i) => {
+                  const info = ESTADOS[s];
+                  return (
+                    <div key={s} className="text-center flex-1">
+                      <div className={`w-3 h-3 mx-auto mb-1.5 transition-all duration-150 ${
+                        i <= currentIdx ? 'bg-orange' : 'bg-[#222]'
+                      }`} />
+                      <p className={`text-[8px] font-bold tracking-[0.1em] uppercase ${
+                        i <= currentIdx ? 'text-white' : 'text-[#444]'
+                      }`}>{info.label}</p>
+                    </div>
+                  );
+                })}
               </div>
-
-              <div className="flex justify-between text-[8px] font-medium text-[#555] uppercase tracking-wider">
-                <span>Pedido</span><span>Pagado</span><span>Enviado</span><span>Entregado</span>
+              <div className="h-px bg-[#222] mt-[-14px] -z-10 relative">
+                <div className="h-px bg-orange transition-all duration-300"
+                     style={{ width: currentIdx >= 0 ? `${(currentIdx / (STEP_MAP.length - 1)) * 100}%` : 0 }} />
               </div>
             </div>
 
-            <div className="card p-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div><p className="text-[#666] text-xs">Cliente</p><p className="font-semibold text-sm text-[#f5f5f5]">{resultado.cliente_nombre}</p></div>
-                <div><p className="text-[#666] text-xs">Total</p><p className="font-semibold text-sm text-[#f5f5f5]">${resultado.total?.toLocaleString('es-CL')}</p></div>
-                <div><p className="text-[#666] text-xs">Entrega</p><p className="font-semibold text-sm text-[#f5f5f5]">{resultado.tipo_entrega === 'ENVIO_STARKEN' ? 'Starken' : 'Showroom'}</p></div>
-                <div><p className="text-[#666] text-xs">Fecha</p><p className="font-semibold text-sm text-[#f5f5f5]">{resultado.created_at ? new Date(resultado.created_at).toLocaleDateString('es-CL') : '-'}</p></div>
+            {/* Order info */}
+            <div className="p-6 space-y-4">
+              <p className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase">Detalle</p>
+              <div className="space-y-3">
+                {pedido.items?.map((item, i) => (
+                  <div key={i} className="flex justify-between items-center border-b border-[#222] pb-2">
+                    <div>
+                      <p className="font-display text-sm text-white">{item.nombre || item.producto?.nombre}</p>
+                      <p className="font-mono text-[8px] text-[#555] tracking-[0.1em] uppercase">{item.marca || item.producto?.marca} — {item.modalidad || ''}</p>
+                    </div>
+                    <p className="font-display text-sm text-white">x{item.cantidad}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between border-t border-[#333] pt-3">
+                <p className="text-[#666] text-xs">Total</p>
+                <p className="font-display font-bold text-orange">
+                  ${Number(pedido.total || 0).toLocaleString('es-CL')}
+                </p>
+              </div>
+              <div className="text-[#555] text-xs space-y-1 pt-2">
+                <p><span className="text-[#666]">Cliente:</span> {pedido.nombre}</p>
+                {pedido.direccion && <p><span className="text-[#666]">Envio:</span> {pedido.direccion}, {pedido.comuna}, {pedido.region}</p>}
+                {pedido.starken_link && (
+                  <p className="mt-3">
+                    <span className="text-[#666]">Starken:</span>{' '}
+                    <a href={pedido.starken_link} target="_blank" rel="noopener noreferrer"
+                       className="text-orange underline hover:no-underline transition-all duration-150">
+                      Trackear envio
+                    </a>
+                  </p>
+                )}
               </div>
             </div>
-
-            {resultado.seguimiento_url && (
-              <div className="card p-6 text-center border-[#2dd4bf]/10">
-                <p className="font-semibold text-xs uppercase tracking-[0.08em] text-[#2dd4bf] mb-4">Starken</p>
-                <a href={resultado.seguimiento_url} target="_blank" rel="noopener noreferrer"
-                   className="btn btn-primary inline-flex items-center gap-2">
-                  Rastrear
-                </a>
-              </div>
-            )}
           </div>
         )}
       </div>

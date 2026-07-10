@@ -1,155 +1,152 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { Link } from 'react-router-dom';
 
 export default function QuickCart() {
-  const { items, removeItem, updateCantidad, totalPrecio } = useCart();
-  const [open, setOpen] = useState(false);
+  const { items, removeItem, updateCantidad, total, clearCart } = useCart();
+  const [abierto, setAbierto] = useState(false);
   const [cupon, setCupon] = useState('');
-  const [descuento, setDescuento] = useState(0);
-  const [cuponMsg, setCuponMsg] = useState('');
+  const [cuponData, setCuponData] = useState(null);
+  const [cuponError, setCuponError] = useState('');
 
   useEffect(() => {
-    const handleKey = (e) => { if (e.key === 'Escape') setOpen(false); };
-    const toggle = () => setOpen((v) => !v);
-    document.addEventListener('keydown', handleKey);
-    window.addEventListener('toggle-cart', toggle);
-    return () => {
-      document.removeEventListener('keydown', handleKey);
-      window.removeEventListener('toggle-cart', toggle);
-    };
+    const handler = () => setAbierto((prev) => !prev);
+    window.addEventListener('toggle-cart', handler);
+    return () => window.removeEventListener('toggle-cart', handler);
   }, []);
 
   const validarCupon = async () => {
-    if (!cupon) return;
-    setCuponMsg('Validando...');
+    setCuponError('');
+    setCuponData(null);
     try {
-      const res = await fetch('/api/validar-cupon', {
+      const r = await fetch('/api/validar-cupon', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codigo: cupon, total_actual: totalPrecio }),
+        body: JSON.stringify({ codigo: cupon, total, items }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        setDescuento(data.descuento);
-        setCuponMsg(`${data.valor}${data.tipo === 'PERCENT' ? '%' : '$'} off`);
-      } else {
-        setDescuento(0);
-        setCuponMsg(data.error);
-      }
-    } catch {
-      setDescuento(0);
-      setCuponMsg('Error');
-    }
+      const data = await r.json();
+      if (r.ok) setCuponData(data);
+      else setCuponError(data.error || 'Codigo invalido');
+    } catch { setCuponError('Error al validar'); }
   };
 
-  const total = Math.max(0, totalPrecio - descuento);
+  const descuento = cuponData
+    ? cuponData.tipo === 'PERCENT' ? total * (cuponData.valor / 100) : cuponData.valor
+    : 0;
+  const totalFinal = Math.max(0, total - descuento);
+
+  if (!abierto) return null;
 
   return (
-    <>
-      {open && <div className="fixed inset-0 bg-black/60 z-50" onClick={() => setOpen(false)} />}
+    <div className="fixed inset-0 z-50 flex justify-end">
+      <div className="absolute inset-0 bg-black/80" onClick={() => setAbierto(false)} />
+      <div className="relative w-full max-w-md bg-black border-l border-[#333] flex flex-col animate-slide-in">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#333]">
+          <h2 className="font-display font-bold text-sm text-white tracking-[0.08em] uppercase">
+            Carro <span className="text-[#555] font-normal">({items.length})</span>
+          </h2>
+          <button onClick={() => setAbierto(false)} className="text-[#666] hover:text-white transition-colors duration-150">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
 
-      <div className={`fixed top-0 right-0 h-full w-full max-w-sm bg-deep border-l border-[#2a2a2a] z-50 transform transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2a]">
-            <h2 className="font-display font-bold text-sm text-[#f5f5f5]">Carrito</h2>
-            <button onClick={() => setOpen(false)} className="text-[#666] hover:text-[#f5f5f5] transition-colors p-0.5">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto px-5 py-5 space-y-3">
-            {items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center mt-16 gap-3">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5">
-                  <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-                </svg>
-                <p className="text-[#666] text-sm">Carrito vacio</p>
-              </div>
-            ) : (
-              items.map((item, idx) => (
-                <div key={idx} className="flex gap-3 p-3 rounded border border-[#2a2a2a]">
-                  <img src={item.producto.imagen_url} alt={item.producto.nombre}
-                       className="w-14 h-14 object-cover rounded border border-[#2a2a2a] flex-shrink-0"
-                       onError={(e) => { e.target.style.display = 'none'; }} />
+        <div className="flex-1 overflow-y-auto">
+          {items.length === 0 ? (
+            <div className="text-center py-16 px-6">
+              <svg className="w-10 h-10 text-[#333] mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+              <p className="text-[#666] text-sm">Tu carro esta vacio</p>
+            </div>
+          ) : (
+            <div>
+              {items.map((item) => (
+                <div key={item.producto.id} className="flex gap-4 px-6 py-4 border-b border-[#222]">
+                  <div className="w-16 h-16 bg-[#0d0d0d] flex-shrink-0 border border-[#333]">
+                    {item.producto.imagen ? (
+                      <img src={item.producto.imagen} alt={item.producto.nombre} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-[#333]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-[#f5f5f5] truncate">{item.producto.nombre}</p>
-                    <p className="text-[#666] text-xs mt-0.5">Talle: {item.talle}</p>
-                    <p className="font-bold text-sm text-[#f5f5f5] mt-1">${(item.producto.precio * item.cantidad).toLocaleString('es-CL')}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <button onClick={() => updateCantidad(idx, item.cantidad - 1)}
-                              className="w-6 h-6 rounded border border-[#2a2a2a] text-[#666] hover:text-[#f5f5f5] hover:border-[#555] transition-colors flex items-center justify-center">
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                      </button>
-                      <span className="font-semibold text-sm text-[#f5f5f5] w-5 text-center">{item.cantidad}</span>
-                      <button onClick={() => updateCantidad(idx, item.cantidad + 1)}
-                              className="w-6 h-6 rounded border border-[#2a2a2a] text-[#666] hover:text-[#f5f5f5] hover:border-[#555] transition-colors flex items-center justify-center">
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                      </button>
-                      <button onClick={() => removeItem(idx)}
-                              className="ml-auto text-[#555] hover:text-amber transition-colors p-0.5">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                        </svg>
-                      </button>
+                    <p className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase mb-0.5">{item.producto.marca}</p>
+                    <p className="font-display font-bold text-sm text-white truncate">{item.producto.nombre}</p>
+                    <p className="font-display font-bold text-sm text-orange mt-1">
+                      ${Number(item.producto.precio).toLocaleString('es-CL')}
+                    </p>
+                    {item.producto.modalidad === 'ENCARGO' && (
+                      <p className="font-mono text-[8px] text-[#555] tracking-[0.1em] mt-1">PRE-ORDER</p>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <button onClick={() => removeItem(item.producto.id)}
+                            className="text-[#555] hover:text-white transition-colors duration-150 text-xs">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                    </button>
+                    <div className="flex items-center gap-0 border border-[#333]">
+                      <button onClick={() => { if (item.cantidad > 1) updateCantidad(item.producto.id, item.cantidad - 1); }}
+                              className="px-2 py-0.5 text-[#666] hover:text-white text-xs transition-colors duration-150">−</button>
+                      <span className="px-2 py-0.5 text-white text-xs font-bold">{item.cantidad}</span>
+                      <button onClick={() => updateCantidad(item.producto.id, item.cantidad + 1)}
+                              className="px-2 py-0.5 text-[#666] hover:text-white text-xs transition-colors duration-150">+</button>
                     </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
 
-          {items.length > 0 && (
-            <div className="border-t border-[#2a2a2a] px-5 py-5 space-y-3">
-              <div className="flex gap-2">
-                <input value={cupon} onChange={(e) => setCupon(e.target.value.toUpperCase())}
-                       placeholder="Cupon" className="input flex-1 text-xs" />
-                <button onClick={validarCupon}
-                        className="btn btn-outline text-[10px] px-3 py-2">Aplicar</button>
-              </div>
-              {cuponMsg && (
-                <p className={`text-xs font-medium ${descuento > 0 ? 'text-[#2dd4bf]' : 'text-amber'}`}>{cuponMsg}</p>
-              )}
-
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between text-[#666]">
-                  <span>Subtotal</span>
-                  <span>${totalPrecio.toLocaleString('es-CL')}</span>
+              {/* Coupon */}
+              <div className="px-6 py-4 border-b border-[#222]">
+                <p className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase mb-2">Tienes un cupon?</p>
+                <div className="flex gap-0">
+                  <input value={cupon} onChange={(e) => setCupon(e.target.value.toUpperCase())}
+                         placeholder="CODIGO"
+                         className="input flex-1 text-xs border-r-0" />
+                  <button onClick={validarCupon}
+                          className="px-4 py-2 text-xs font-bold tracking-[0.1em] uppercase bg-orange text-black hover:bg-orange-light transition-colors duration-150">
+                    OK
+                  </button>
                 </div>
-                {descuento > 0 && (
-                  <div className="flex justify-between text-[#2dd4bf]">
-                    <span>Descuento</span>
-                    <span>-${descuento.toLocaleString('es-CL')}</span>
-                  </div>
+                {cuponData && (
+                  <p className={`text-xs font-bold mt-2 ${cuponData.tipo === 'PERCENT' ? 'text-white' : 'text-white'}`}>
+                    Descuento: {cuponData.tipo === 'PERCENT' ? `${cuponData.valor}%` : `$${Number(cuponData.valor).toLocaleString('es-CL')}`}
+                  </p>
                 )}
-                <div className="flex justify-between font-bold text-base border-t border-[#2a2a2a] pt-2.5 mt-2.5">
-                  <span className="text-[#f5f5f5]">Total</span>
-                  <span className="text-[#f5f5f5]">${total.toLocaleString('es-CL')}</span>
-                </div>
+                {cuponError && <p className="text-xs text-[#666] mt-2">{cuponError}</p>}
               </div>
-
-              <Link to="/checkout" onClick={() => setOpen(false)}
-                    className="btn btn-primary w-full text-center">
-                Finalizar Compra
-              </Link>
             </div>
           )}
         </div>
+
+        <div className="border-t border-[#333] px-6 py-4 space-y-3">
+          <div className="flex justify-between text-sm">
+            <span className="text-[#666]">Subtotal</span>
+            <span className="text-white font-bold">${Number(total).toLocaleString('es-CL')}</span>
+          </div>
+          {descuento > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-orange">Descuento</span>
+              <span className="text-orange font-bold">-${Number(descuento).toLocaleString('es-CL')}</span>
+            </div>
+          )}
+          <div className="flex justify-between border-t border-[#333] pt-3">
+            <span className="font-display font-bold text-white">Total</span>
+            <span className="font-display font-bold text-white text-lg">${Number(totalFinal).toLocaleString('es-CL')}</span>
+          </div>
+          <div className="flex gap-1">
+            <Link to="/checkout" onClick={() => setAbierto(false)}
+                  className="btn btn-primary flex-1 justify-center text-xs py-3">
+              IR A CHECKOUT
+            </Link>
+            <button onClick={clearCart}
+                    className="btn btn-outline px-3 py-3 text-xs">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <button onClick={() => setOpen(true)}
-              className={`fixed bottom-5 right-5 z-40 bg-purple text-white font-bold px-5 py-3 text-xs uppercase tracking-[0.1em] rounded-lg shadow-lg hover:bg-[#6d28d9] hover:scale-105 active:scale-100 transition-all duration-200 ${
-                items.length === 0 ? 'opacity-40' : ''
-              }`}>
-        <span className="flex items-center gap-2">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-          </svg>
-          {items.reduce((s, i) => s + i.cantidad, 0)}
-        </span>
-      </button>
-    </>
+      <style>{`@keyframes slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } } .animate-slide-in { animation: slide-in 0.2s ease-out; }`}</style>
+    </div>
   );
 }

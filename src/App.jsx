@@ -1,52 +1,74 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import QuickCart from './components/QuickCart';
-import AdminLogin from './components/AdminLogin';
 import PageTransition from './components/PageTransition';
+import ScrollReveal from './components/ScrollReveal';
 import Home from './views/Client/Home';
 import ProductDetail from './views/Client/ProductDetail';
 import Checkout from './views/Client/Checkout';
 import Seguimiento from './views/Client/Seguimiento';
-import Dashboard from './views/Admin/Dashboard';
-import Inventory from './views/Admin/Inventory';
-import Coupons from './views/Admin/Coupons';
+import AdminDashboard from './views/Admin/Dashboard';
+import AdminInventory from './views/Admin/Inventory';
+import AdminLayout from './views/Admin/AdminLayout';
 
-export default function App() {
+let clickCount = 0;
+let clickTimer = null;
+
+function AppContent() {
   const location = useLocation();
-  const [showLogin, setShowLogin] = useState(false);
-  const [logoClicks, setLogoClicks] = useState(0);
+  const isAdmin = location.pathname.startsWith('/admin');
 
   const handleLogoClick = () => {
-    const n = logoClicks + 1;
-    setLogoClicks(n);
-    if (n >= 5) {
-      setLogoClicks(0);
-      setShowLogin(true);
+    clickCount++;
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => { clickCount = 0; }, 1000);
+    if (clickCount >= 5) {
+      clickCount = 0;
+      window.dispatchEvent(new CustomEvent('open-admin-login'));
     }
-    setTimeout(() => setLogoClicks((c) => Math.max(0, c - 1)), 3000);
   };
 
+  if (isAdmin) {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="inventario" element={<AdminInventory />} />
+        </Route>
+      </Routes>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-deep flex flex-col">
+    <>
       <Navbar onLogoClick={handleLogoClick} />
-      <main className="flex-1">
-        <PageTransition key={location.pathname}>
+      <main className="min-h-screen">
+        <PageTransition locationKey={location.pathname}>
           <Routes location={location}>
-            <Route path="/" element={<Home onLogoClick={handleLogoClick} />} />
+            <Route path="/" element={<Home />} />
             <Route path="/producto/:id" element={<ProductDetail />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/seguimiento" element={<Seguimiento />} />
-            <Route path="/admin" element={<Dashboard />} />
-            <Route path="/admin/inventario" element={<Inventory />} />
-            <Route path="/admin/cupones" element={<Coupons />} />
           </Routes>
         </PageTransition>
       </main>
       <Footer />
       <QuickCart />
-      {showLogin && <AdminLogin onClose={() => setShowLogin(false)} />}
-    </div>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }

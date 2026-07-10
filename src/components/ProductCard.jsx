@@ -1,91 +1,69 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { useState } from 'react';
 
-export default function ProductCard({ producto, index = 0 }) {
+export default function ProductCard({ producto, index }) {
+  const { addItem } = useCart();
   const [imgError, setImgError] = useState(false);
-
-  const tallesDisponibles = producto.modalidad === 'ENCARGO'
-    ? producto.talles?.filter((t) => t.talle) || []
-    : producto.talles?.filter((t) => parseInt(t.cantidad) > 0) || [];
-
-  const sinStock = producto.modalidad === 'STOCK' && tallesDisponibles.length === 0;
-  const totalStock = producto.modalidad === 'STOCK'
-    ? tallesDisponibles.reduce((s, t) => s + parseInt(t.cantidad), 0)
-    : 0;
-
-  const isLowStock = producto.modalidad === 'STOCK' && totalStock > 0 && totalStock <= 5;
+  const isStock = producto.modalidad === 'STOCK';
 
   return (
-    <Link to={`/producto/${producto.id}`}
-          className="card-hover block group"
-          style={{
-            animation: `fade-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.03}s both`,
-          }}>
-      <div className="relative aspect-[4/5] overflow-hidden rounded-t-[7px]">
-        {imgError ? (
-          <div className="w-full h-full flex items-center justify-center bg-surface2">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1">
-              <circle cx="9" cy="9" r="4"/><path d="M4 20h16"/><path d="M9 16l-5-5 5-5"/><path d="M15 16l5-5-5-5"/>
-            </svg>
-          </div>
-        ) : (
-          <img
-            src={producto.imagen_url}
-            alt={producto.nombre}
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-            onError={() => setImgError(true)}
-            loading="lazy"
-          />
-        )}
-
-        {/* Shimmer overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/40 via-transparent to-transparent
-                      opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-          {producto.modalidad === 'STOCK' ? (
-            <span className="tag tag-stock">Instant Drop</span>
+    <div className="group relative bg-black transition-all duration-200" style={{ animationDelay: `${(index || 0) * 0.02}s` }}>
+      <Link to={`/producto/${producto.id}`} className="block">
+        <div className="aspect-[4/5] overflow-hidden bg-[#0d0d0d]">
+          {producto.imagen && !imgError ? (
+            <img
+              src={producto.imagen}
+              alt={producto.nombre}
+              className="w-full h-full object-cover transition-all duration-300 group-hover:scale-[1.03]"
+              onError={() => setImgError(true)}
+            />
           ) : (
-            <span className="tag tag-preorder">Pre-Order</span>
-          )}
-          {isLowStock && (
-            <span className="tag" style={{ background: 'rgba(245, 158, 11, 0.08)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.15)' }}>
-              Ultimos
-            </span>
-          )}
-          {sinStock && (
-            <span className="tag" style={{ background: 'rgba(153, 153, 153, 0.08)', color: '#999', border: '1px solid rgba(153, 153, 153, 0.15)' }}>
-              Sin Stock
-            </span>
+            <div className="w-full h-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-[#333]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+              </svg>
+            </div>
           )}
         </div>
+      </Link>
 
-        {producto.modalidad === 'ENCARGO' && producto.tiempo_espera_dias > 0 && (
-          <div className="absolute bottom-3 right-3">
-            <span className="text-[9px] font-medium px-2 py-1 rounded bg-[#141414] text-[#999] border border-[#2a2a2a]">
-              ~{producto.tiempo_espera_dias} dias
-            </span>
-          </div>
-        )}
-      </div>
+      {isStock ? (
+        <div className="absolute top-0 left-0">
+          <span className="tag tag-stock bg-black border-0 text-[8px] px-2 py-1 tracking-[0.15em]">INSTANT DROP</span>
+        </div>
+      ) : (
+        <div className="absolute top-0 left-0">
+          <span className="tag tag-preorder bg-black border-0 text-[8px] px-2 py-1 tracking-[0.15em]">PRE-ORDER</span>
+        </div>
+      )}
 
-      <div className="p-4 space-y-2">
-        <p className="text-[#666] text-[9px] font-medium uppercase tracking-[0.12em]">{producto.marca}</p>
-        <h3 className="font-display font-bold text-sm text-[#f5f5f5] group-hover:text-purple transition-colors duration-200">
-          {producto.nombre}
-        </h3>
-
-        <div className="flex items-center justify-between pt-2 border-t border-[#2a2a2a]">
-          <p className="font-display font-black text-base text-[#f5f5f5]">
-            ${producto.precio.toLocaleString('es-CL')}
-          </p>
-          {!sinStock && (
-            <span className="text-[9px] font-medium text-[#555]">
-              {tallesDisponibles.length} talles
-            </span>
-          )}
+      <div className="px-4 py-3 border-t border-[#222]">
+        <p className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase mb-1.5">{producto.marca}</p>
+        <Link to={`/producto/${producto.id}`} className="block">
+          <h3 className="font-display font-bold text-sm text-white leading-tight transition-colors duration-150 group-hover:text-orange">
+            {producto.nombre}
+          </h3>
+        </Link>
+        <div className="flex items-center justify-between mt-2">
+          <span className="font-display font-bold text-base text-white">
+            ${Number(producto.precio).toLocaleString('es-CL')}
+          </span>
+          <span className={`font-mono text-[8px] tracking-[0.1em] ${producto.stock > 0 ? 'text-[#555]' : 'text-[#333]'}`}>
+            {producto.stock > 0 ? `${producto.stock}u` : '0'}
+          </span>
         </div>
       </div>
-    </Link>
+
+      <button onClick={() => addItem(producto)}
+              disabled={producto.stock < 1}
+              className={`btn w-full border-t border-[#222] rounded-none text-[10px] py-2.5 ${
+                producto.stock < 1
+                  ? 'bg-[#111] text-[#444] cursor-default'
+                  : 'bg-[#111] text-[#666] hover:bg-orange hover:text-black'
+              }`}>
+        {producto.stock < 1 ? 'AGOTADO' : isStock ? 'AGREGAR' : 'ENCARGAR'}
+      </button>
+    </div>
   );
 }
