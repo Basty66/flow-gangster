@@ -1,42 +1,36 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useContext, useReducer, useEffect, useState } from 'react';
 
 const CartContext = createContext();
-
 const STORAGE_KEY = 'flowgangster_cart';
 
 function loadCart() {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 function cartReducer(state, action) {
   switch (action.type) {
     case 'ADD_ITEM': {
       const { producto, talle, cantidad } = action.payload;
-      const existing = state.find(
-        (i) => i.producto.id === producto.id && i.talle === talle
-      );
-      if (existing) {
-        return state.map((i) =>
-          i.producto.id === producto.id && i.talle === talle
-            ? { ...i, cantidad: i.cantidad + cantidad }
-            : i
-        );
+      const idx = state.findIndex((i) => i.producto.id === producto.id);
+      if (idx >= 0) {
+        const next = [...state];
+        next[idx] = { ...next[idx], cantidad: next[idx].cantidad + cantidad };
+        return next;
       }
       return [...state, { producto, talle, cantidad }];
     }
     case 'REMOVE_ITEM':
-      return state.filter((_, idx) => idx !== action.payload);
-    case 'UPDATE_CANTIDAD':
-      return state.map((item, idx) =>
-        idx === action.payload.index
-          ? { ...item, cantidad: Math.max(1, action.payload.cantidad) }
-          : item
-      );
+      return state.filter((i) => i.producto.id !== action.payload);
+    case 'UPDATE_CANTIDAD': {
+      const idx = state.findIndex((i) => i.producto.id === action.payload.id);
+      if (idx < 0) return state;
+      const next = [...state];
+      next[idx] = { ...next[idx], cantidad: Math.max(1, action.payload.cantidad) };
+      return next;
+    }
     case 'CLEAR':
       return [];
     default:
@@ -46,6 +40,8 @@ function cartReducer(state, action) {
 
 export function CartProvider({ children }) {
   const [items, dispatch] = useReducer(cartReducer, [], loadCart);
+  const [cupon, setCupon] = useState('');
+  const [cuponData, setCuponData] = useState(null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
@@ -54,24 +50,19 @@ export function CartProvider({ children }) {
   const addItem = (producto, talle, cantidad = 1) =>
     dispatch({ type: 'ADD_ITEM', payload: { producto, talle, cantidad } });
 
-  const removeItem = (index) =>
-    dispatch({ type: 'REMOVE_ITEM', payload: index });
+  const removeItem = (id) =>
+    dispatch({ type: 'REMOVE_ITEM', payload: id });
 
-  const updateCantidad = (index, cantidad) =>
-    dispatch({ type: 'UPDATE_CANTIDAD', payload: { index, cantidad } });
+  const updateCantidad = (id, cantidad) =>
+    dispatch({ type: 'UPDATE_CANTIDAD', payload: { id, cantidad } });
 
-  const clearCart = () => dispatch({ type: 'CLEAR' });
+  const clearCart = () => { setCupon(''); setCuponData(null); dispatch({ type: 'CLEAR' }); };
 
   const totalItems = items.reduce((sum, i) => sum + i.cantidad, 0);
-  const totalPrecio = items.reduce(
-    (sum, i) => sum + i.producto.precio * i.cantidad,
-    0
-  );
+  const total = items.reduce((sum, i) => sum + i.producto.precio * i.cantidad, 0);
 
   return (
-    <CartContext.Provider
-      value={{ items, addItem, removeItem, updateCantidad, clearCart, totalItems, totalPrecio }}
-    >
+    <CartContext.Provider value={{ items, addItem, removeItem, updateCantidad, clearCart, totalItems, total, cupon, setCupon, cuponData, setCuponData }}>
       {children}
     </CartContext.Provider>
   );
