@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
+import HeroCarousel from '../../components/HeroCarousel';
 
 function Skeleton() {
   return (
@@ -15,12 +16,13 @@ function Skeleton() {
   );
 }
 
-export default function Home({ onLogoClick }) {
+export default function Home() {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filtro, setFiltro] = useState('TODO');
   const [busqueda, setBusqueda] = useState('');
+  const catalogoRef = useRef(null);
 
   const fetchProductos = () => {
     setLoading(true);
@@ -42,60 +44,14 @@ export default function Home({ onLogoClick }) {
     return true;
   });
 
-  const marcas = [...new Set(productos.map((p) => p.marca))];
-
   return (
     <div className="min-h-screen">
-      {/* Hero */}
-      <section className="min-h-[80vh] flex items-center justify-center border-b border-[#333]">
-        <div className="text-center px-4 max-w-4xl mx-auto pt-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 border border-[#333] mb-8">
-            <span className="w-1 h-1 bg-orange" />
-            <span className="text-[#666] font-mono text-[9px] tracking-[0.2em] uppercase">Coleccion 2026</span>
-          </div>
-
-          <h1 className="font-display font-black text-6xl sm:text-7xl md:text-8xl lg:text-9xl leading-[0.85] tracking-[-0.04em] mb-6">
-            <span className="text-white">NEXT</span>
-            <br />
-            <span className="text-orange">DROP</span>
-          </h1>
-
-          <p className="text-[#666] text-base md:text-lg max-w-lg mx-auto mb-10 font-body leading-relaxed">
-            Zapatillas urbanas directo de la calle a tus pies. Stock fisico en Melipilla
-            y pedidos por encargo con delivery a todo Chile.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-3">
-            <a href="#catalogo"
-               className="btn btn-primary"
-               onClick={(e) => { e.preventDefault(); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}>
-              Explorar Coleccion
-            </a>
-            <Link to="/seguimiento" className="btn btn-outline">
-              Trackear Pedido
-            </Link>
-          </div>
-
-          <div className="flex justify-center gap-16 mt-16">
-            <div>
-              <p className="font-display font-black text-3xl text-white">{productos.filter(p => p.modalidad === 'STOCK').length}</p>
-              <p className="text-[#666] text-xs font-medium tracking-[0.1em] uppercase mt-1">Instant Drop</p>
-            </div>
-            <div>
-              <p className="font-display font-black text-3xl text-white">{productos.filter(p => p.modalidad === 'ENCARGO').length}</p>
-              <p className="text-[#666] text-xs font-medium tracking-[0.1em] uppercase mt-1">Pre-Order</p>
-            </div>
-            <div>
-              <p className="font-display font-black text-3xl text-white">{marcas.length}</p>
-              <p className="text-[#666] text-xs font-medium tracking-[0.1em] uppercase mt-1">Marcas</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroCarousel />
 
       {/* Catalog */}
-      <section id="catalogo" className="max-w-7xl mx-auto pt-16 pb-20">
-        <div className="px-4 pb-6 border-b border-[#333] mb-0">
+      <section ref={catalogoRef} id="catalogo" className="max-w-7xl mx-auto pt-16 pb-20">
+        <div className="px-4 pb-6 border-b border-[#333] mb-0"
+             style={{ animation: 'fadeUp 0.4s ease-out' }}>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex gap-0">
               {[
@@ -104,8 +60,8 @@ export default function Home({ onLogoClick }) {
                 { key: 'ENCARGO', label: 'Pre-Order' },
               ].map((f) => (
                 <button key={f.key} onClick={() => setFiltro(f.key)}
-                        className={`px-4 py-2 text-xs font-medium tracking-[0.08em] uppercase border border-[#333] transition-colors duration-150 ${
-                          filtro === f.key ? 'bg-orange text-black border-orange' : 'text-[#666] hover:text-white'
+                        className={`px-4 py-2 text-xs font-medium tracking-[0.08em] uppercase border border-[#333] transition-all duration-200 ${
+                          filtro === f.key ? 'bg-orange text-black border-orange' : 'text-[#666] hover:text-white hover:border-[#555]'
                         }`}>
                   {f.label}
                 </button>
@@ -117,13 +73,13 @@ export default function Home({ onLogoClick }) {
               </svg>
               <input value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
                      placeholder="Buscar..."
-                     className="input pl-9 w-44 text-xs" />
+                     className="input pl-9 w-44 text-xs transition-all duration-200 focus:w-56" />
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="text-center py-20 px-4">
+          <div className="text-center py-20 px-4" style={{ animation: 'fadeUp 0.4s ease-out' }}>
             <p className="text-[#666] text-sm mb-4">{error}</p>
             <button onClick={fetchProductos} className="btn btn-primary">Reintentar</button>
           </div>
@@ -136,7 +92,7 @@ export default function Home({ onLogoClick }) {
         )}
 
         {!loading && !error && filtrados.length === 0 && (
-          <div className="text-center py-20 px-4">
+          <div className="text-center py-20 px-4" style={{ animation: 'fadeUp 0.4s ease-out' }}>
             <p className="font-display font-black text-6xl text-[#1a1a1a] tracking-[-0.04em]">SOLD OUT</p>
             <p className="text-[#555] text-sm mt-4">
               {busqueda ? `Sin resultados para "${busqueda}"` : 'No hay productos con esos filtros'}
@@ -150,14 +106,17 @@ export default function Home({ onLogoClick }) {
         {!loading && !error && filtrados.length > 0 && (
           <div className="grid-products">
             {filtrados.map((p, i) => (
-              <ProductCard key={p.id} producto={p} index={i} />
+              <div key={p.id} style={{ animation: `fadeUp 0.35s ease-out ${i * 0.03}s both` }}>
+                <ProductCard producto={p} index={i} />
+              </div>
             ))}
           </div>
         )}
       </section>
 
       {/* Pre-order CTA */}
-      <section className="border-t border-[#333] py-20">
+      <section className="border-t border-[#333] py-20"
+               style={{ animation: 'fadeUp 0.5s ease-out' }}>
         <div className="max-w-2xl mx-auto px-4 text-center">
           <span className="tag tag-preorder mb-5">Pre-Order</span>
           <h2 className="font-display font-black text-4xl md:text-5xl mb-4 tracking-[-0.02em] leading-tight">
@@ -169,7 +128,7 @@ export default function Home({ onLogoClick }) {
             Trabajamos con pedidos por encargo. Si quieres un modelo que no esta en stock,
             lo importamos directo para ti. Tiempo estimado: 15-20 dias habiles.
           </p>
-          <button onClick={() => setFiltro('ENCARGO')} className="btn btn-primary">
+          <button onClick={() => setFiltro('ENCARGO')} className="btn btn-primary transition-all duration-200 hover:scale-[1.02] active:scale-[0.97]">
             Ver Modelos Disponibles
           </button>
         </div>

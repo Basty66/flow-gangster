@@ -42,22 +42,24 @@ export default function ProductDetail() {
   );
 
   const isStock = producto.modalidad === 'STOCK';
+  const isOffer = producto.precio_oferta && producto.oferta_hasta;
 
   return (
     <div className="pt-24 pb-20">
       <div className="max-w-7xl mx-auto px-4">
-        <Link to="/" className="inline-flex items-center gap-2 text-xs font-medium tracking-[0.08em] uppercase text-[#666] hover:text-white mb-6 transition-colors duration-150">
+        <Link to="/" className="inline-flex items-center gap-2 text-xs font-medium tracking-[0.08em] uppercase text-[#666] hover:text-white mb-6 transition-all duration-200 hover:gap-3">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           Volver
         </Link>
 
-        <div className="grid md:grid-cols-2 gap-0 border border-[#333]">
+        <div className="grid md:grid-cols-2 gap-0 border border-[#333]"
+             style={{ animation: 'fadeUp 0.35s ease-out' }}>
           <div className="aspect-[4/5] overflow-hidden bg-[#0d0d0d] cursor-crosshair group">
             {producto.imagen && !imgError ? (
               <img
                 src={producto.imagen}
                 alt={producto.nombre}
-                className="w-full h-full object-cover transition-all duration-300 group-hover:scale-[1.05]"
+                className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.08]"
                 onError={() => setImgError(true)}
               />
             ) : (
@@ -78,9 +80,25 @@ export default function ProductDetail() {
                 <span className="font-mono text-[9px] text-[#555] tracking-[0.15em] uppercase">{producto.marca}</span>
               </div>
               <h1 className="font-display font-black text-2xl sm:text-3xl md:text-4xl text-white leading-tight tracking-[-0.02em]">{producto.nombre}</h1>
-              <p className="font-display font-black text-3xl sm:text-4xl text-orange mt-4">
-                ${Number(producto.precio).toLocaleString('es-CL')}
-              </p>
+              <div className="flex items-baseline gap-3 mt-4">
+                {isOffer ? (
+                  <>
+                    <p className="font-display font-black text-3xl sm:text-4xl text-orange">
+                      ${Number(producto.precio_oferta).toLocaleString('es-CL')}
+                    </p>
+                    <p className="font-display font-bold text-lg text-[#555] line-through">
+                      ${Number(producto.precio).toLocaleString('es-CL')}
+                    </p>
+                    <span className="px-2 py-0.5 bg-orange text-black font-mono text-[8px] font-bold tracking-[0.1em]">
+                      -{Math.round((1 - producto.precio_oferta / producto.precio) * 100)}%
+                    </span>
+                  </>
+                ) : (
+                  <p className="font-display font-black text-3xl sm:text-4xl text-white">
+                    ${Number(producto.precio).toLocaleString('es-CL')}
+                  </p>
+                )}
+              </div>
               {!isStock && (
                 <p className="text-[#666] text-sm mt-3 font-body leading-relaxed">
                   Tiempo estimado de llegada: <span className="text-white">15-20 dias habiles</span>
@@ -95,7 +113,7 @@ export default function ProductDetail() {
                   const selected = talleSel === t;
                   return (
                     <button key={t} onClick={() => setTalleSel(t)}
-                            className={`py-3 text-xs font-bold tracking-wide transition-all duration-150 border ${
+                            className={`py-3 text-xs font-bold tracking-wide transition-all duration-200 border ${
                               selected
                                 ? 'bg-orange text-black border-orange'
                                 : 'bg-transparent text-[#666] border-[#333] hover:border-[#666] hover:text-white'
@@ -110,7 +128,9 @@ export default function ProductDetail() {
             <div className="p-6 sm:p-8 space-y-4">
               {producto.stock > 0 ? (
                 <button onClick={() => { addItem(producto); setAdded(true); setTimeout(() => setAdded(false), 1500); }}
-                        className="btn btn-primary w-full py-3 text-xs">
+                        className={`btn w-full justify-center py-3 text-xs transition-all duration-200 ${
+                          added ? 'bg-orange text-black' : 'btn-primary'
+                        }`}>
                   {added ? '✓ AGREGADO' : isStock ? 'AGREGAR AL CARRO' : 'ENCARGAR AHORA'}
                 </button>
               ) : (

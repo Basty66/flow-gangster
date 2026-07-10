@@ -69,6 +69,49 @@ export default async function handler(req, res) {
     }
   }
 
-  res.setHeader('Allow', ['GET', 'POST']);
+  if (req.method === 'PUT') {
+    const { id, destacado, orden_destacado, precio_oferta, oferta_hasta, etiqueta_oferta, nombre, marca, precio, descripcion } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: 'id requerido' });
+    }
+
+    try {
+      const sets = [];
+      const values = [];
+      let idx = 1;
+
+      if (destacado !== undefined) { sets.push(`destacado = $${idx++}`); values.push(destacado); }
+      if (orden_destacado !== undefined) { sets.push(`orden_destacado = $${idx++}`); values.push(orden_destacado); }
+      if (precio_oferta !== undefined) { sets.push(`precio_oferta = $${idx++}`); values.push(precio_oferta || null); }
+      if (oferta_hasta !== undefined) { sets.push(`oferta_hasta = $${idx++}`); values.push(oferta_hasta || null); }
+      if (etiqueta_oferta !== undefined) { sets.push(`etiqueta_oferta = $${idx++}`); values.push(etiqueta_oferta || null); }
+      if (nombre !== undefined) { sets.push(`nombre = $${idx++}`); values.push(nombre); }
+      if (marca !== undefined) { sets.push(`marca = $${idx++}`); values.push(marca); }
+      if (precio !== undefined) { sets.push(`precio = $${idx++}`); values.push(precio); }
+      if (descripcion !== undefined) { sets.push(`descripcion = $${idx++}`); values.push(descripcion); }
+
+      if (sets.length === 0) {
+        return res.status(400).json({ error: 'No hay campos para actualizar' });
+      }
+
+      values.push(id);
+      const result = await pool.query(
+        `UPDATE productos SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`,
+        values
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Producto no encontrado' });
+      }
+
+      return res.status(200).json(result.rows[0]);
+    } catch (error) {
+      console.error('Error updating product:', error);
+      return res.status(500).json({ error: 'Error al actualizar producto' });
+    }
+  }
+
+  res.setHeader('Allow', ['GET', 'POST', 'PUT']);
   return res.status(405).json({ error: 'Method not allowed' });
 }
